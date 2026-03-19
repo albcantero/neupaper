@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx:*)",
+      "Read(//c/Users/Alberto/Desktop/**)",
+      "Bash(mv neupaper/CLAUDE.md ./CLAUDE.md.bak)",
+      "Bash(yes \"\")",
+      "Bash(cp -r /c/Users/Alberto/Desktop/neupaper-temp/* /c/Users/Alberto/Desktop/neupaper/)",
+      "Bash(cp -r /c/Users/Alberto/Desktop/neupaper-temp/.* /c/Users/Alberto/Desktop/neupaper/)",
+      "Bash(cp /c/Users/Alberto/Desktop/neupaper-temp/package.json /c/Users/Alberto/Desktop/neupaper/)",
+      "Bash(cp /c/Users/Alberto/Desktop/neupaper-temp/package-lock.json /c/Users/Alberto/Desktop/neupaper/)",
+      "Bash(cp /c/Users/Alberto/Desktop/neupaper-temp/postcss.config.mjs /c/Users/Alberto/Desktop/neupaper/)",
+      "Bash(cp /c/Users/Alberto/Desktop/neupaper-temp/tsconfig.json /c/Users/Alberto/Desktop/neupaper/)",
+      "Bash(cp -r /c/Users/Alberto/Desktop/neupaper-temp/public /c/Users/Alberto/Desktop/neupaper/)"
+    ]
+  }
+}
