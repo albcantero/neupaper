@@ -1,0 +1,150 @@
+.neu-document {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 11pt;
+  line-height: 1.7;
+  color: #1a1a1a;
+}
+
+.neu-document h1 {
+  font-size: 24pt;
+  font-weight: 700;
+  margin: 0 0 0.6em;
+  line-height: 1.2;
+  color: #111;
+}
+
+.neu-document h2 {
+  font-size: 18pt;
+  font-weight: 600;
+  margin: 1.4em 0 0.5em;
+  line-height: 1.3;
+  color: #111;
+}
+
+.neu-document h3 {
+  font-size: 14pt;
+  font-weight: 600;
+  margin: 1.2em 0 0.4em;
+  line-height: 1.4;
+  color: #222;
+}
+
+.neu-document h4 {
+  font-size: 12pt;
+  font-weight: 600;
+  margin: 1em 0 0.3em;
+  color: #333;
+}
+
+.neu-document p {
+  margin: 0 0 0.8em;
+}
+
+.neu-document strong {
+  font-weight: 600;
+}
+
+.neu-document a {
+  color: #2563eb;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.neu-document ul,
+.neu-document ol {
+  margin: 0 0 0.8em;
+  padding-left: 1.5em;
+}
+
+.neu-document li {
+  margin: 0.2em 0;
+}
+
+.neu-document li > ul,
+.neu-document li > ol {
+  margin: 0.2em 0 0;
+}
+
+.neu-document blockquote {
+  margin: 0 0 0.8em;
+  padding: 0.4em 0 0.4em 1em;
+  border-left: 3px solid #d1d5db;
+  color: #555;
+}
+
+.neu-document code {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.9em;
+  background: #f3f4f6;
+  padding: 0.15em 0.35em;
+  border-radius: 4px;
+}
+
+.neu-document pre {
+  margin: 0 0 0.8em;
+  padding: 0.8em 1em;
+  background: #f8f9fa;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+.neu-document pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+.neu-document hr {
+  margin: 1.5em 0;
+  border: none;
+  border-top: 1px solid #e5e7eb;
+}
+
+.neu-document table {
+  width: 100%;
+  margin: 0 0 0.8em;
+  border-collapse: collapse;
+  font-size: 10pt;
+}
+
+.neu-document th {
+  font-weight: 600;
+  text-align: left;
+  padding: 0.5em 0.75em;
+  border-bottom: 2px solid #d1d5db;
+}
+
+.neu-document td {
+  padding: 0.4em 0.75em;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.neu-document tr:last-child td {
+  border-bottom: none;
+}
+
+.neu-document img {
+  max-width: 100%;
+  height: auto;
+}
+
+.neu-document input[type="checkbox"] {
+  margin-right: 0.4em;
+}
+
+/* ── Explicit page break ── */
+.neu-document .neu-pagebreak {
+  break-before: page;
+  display: block;
+  height: 0;
+  border-top: 1.5px dashed #94a3b8;
+  margin: 1.5em 0;
+}
+
+/* ── Mermaid Gantt — rotate dense x-axis date labels ── */
+.neu-document svg[aria-roledescription="gantt"] .tick text {
+  transform: rotate(-45deg) translate(-8px, 4px);
+  text-anchor: end;
+  font-size: 10px;
+}
