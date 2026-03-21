@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Neupaper
 
-## Getting Started
+Dynamic documents that think. Small islands of logic in a sea of Markdown.
 
-First, run the development server:
+Neupaper is a web-based document editor with faithful PDF export, inspired by Typst and InDesign but with the simplicity of Markdown. It uses **Markdown Isles** — small islands of logic `${ }` inside standard Markdown — to create dynamic, data-driven documents.
+
+## Features
+
+- **Markdown Isles** — variables, loops, conditionals, and data blocks inside Markdown
+- **Pixel-perfect PDF export** — what you see in the preview is what you get in the PDF
+- **A4 page preview** — editorial canvas with dot pattern, zoom controls, and page-by-page navigation
+- **Smart pagination** — DOM-based page partitioning with paragraph splitting at word boundaries
+- **KaTeX formulas** — native LaTeX math support
+- **Mermaid diagrams** — flowcharts, sequence diagrams, Gantt charts, ER diagrams
+- **Syntax highlighting** — custom CodeMirror extension for `.neu` files
+- **Real-time linter** — catches unclosed blocks and undefined variables as you type
+
+## Quick start
 
 ```bash
+git clone https://github.com/albcantero/neupaper.git
+cd neupaper
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Markdown Isles syntax
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+${ data }
+client.name = Anthropic
+items props(name, price) = [
+  Logo design, 500
+  Website, 1200
+]
+${ end data }
 
-## Learn More
+# Invoice
 
-To learn more about Next.js, take a look at the following resources:
+Dear ${ @client.name },
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+${ for item in @items }
+- ${ item.name }: ${ item.price } EUR
+${ end }
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+${ if @client.type is vip }
+Thank you for your continued trust.
+${ end }
 
-## Deploy on Vercel
+${ pagebreak }
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Terms and conditions
+...
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Stack
+
+- **Next.js** — framework
+- **CodeMirror 6** — editor with custom syntax highlighting
+- **Remark** — Markdown rendering (GFM, math, raw HTML)
+- **Puppeteer** — PDF generation
+- **Tailwind + Shadcn** — UI
+
+## PDF export
+
+PDF export requires Chrome/Chromium. In development, set the `CHROME_PATH` environment variable if Chrome is not in the default location:
+
+```bash
+export CHROME_PATH="/usr/bin/google-chrome"
+```
+
+## License
+
+MIT
