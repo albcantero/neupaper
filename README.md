@@ -2,7 +2,7 @@
 
 Dynamic documents that think. Small islands of logic in a sea of Markdown.
 
-Neupaper is a web-based document editor with faithful PDF export, inspired by Typst and InDesign but with the simplicity of Markdown. It uses **Markdown Isles** — small islands of logic `${ }` inside standard Markdown — to create dynamic, data-driven documents.
+Neupaper is a web-based document editor with faithful PDF export. It uses **Markdown Isles** — small islands of logic `${ }` inside standard Markdown — to create dynamic, data-driven documents.
 
 ## Features
 
@@ -24,13 +24,11 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
-
 ## Markdown Isles syntax
 
 ```
 ${ data }
-client.name = Anthropic
+client.name = Acme Corp
 items props(name, price) = [
   Logo design, 500
   Website, 1200

@@ -218,62 +218,7 @@ Approach final implementado — en vez de renderizar todo y cortar con `translat
 
 ## 2026-03-21 — Sticky Headings
 
-Inspirado en Typst: si un heading (`<h1>`–`<h6>`) cabe al final de una página pero el siguiente elemento no cabe después, el heading migra a la siguiente página. Evita headings huérfanos al final de página sin contenido debajo.
-
----
-
-## 2026-03-21 — Análisis del layout engine de Typst
-
-Estudiamos el código fuente de Typst (`crates/typst-layout/src/`) para extraer ideas aplicables.
-
-### Arquitectura de Typst (3 fases)
-
-**1. Collect** (`flow/collect.rs`) — Clasifica cada elemento como:
-
-- `Single` — indivisible (imágenes, bloques con `fr` height)
-- `Multi` — partible entre páginas (párrafos, bloques breakable)
-- `Spacing` — con niveles de "debilidad" (0-5) para colapso
-- Marca elementos como **sticky** (headings que no deben quedar huérfanos)
-
-**2. Distribute** (`flow/distribute.rs`) — Procesa elementos secuencialmente:
-
-- Intenta encajar cada uno en la "región" actual (página)
-- Si no cabe un Multi, guarda el **spill** (sobrante) para la siguiente región
-- Si no cabe un Single, migra entero a la siguiente región
-
-**3. Compose** (`flow/compose.rs`) — Maneja floats, footnotes, re-layout:
-
-- Usa **checkpoints** para hacer rollback
-- Footnote invariant: una referencia y su nota deben estar en la misma página
-
-### Ideas aplicadas a Neupaper
-
-|Concepto Typst|Estado|
-|---|---|
-|Sticky headings|✅ Implementado|
-|Single vs Multi (indivisible vs partible)|✅ `<p>` partible, resto indivisible|
-|Spill pattern|✅ `splitParagraph()` devuelve segunda mitad|
-
-### Ideas para implementar en el futuro
-
-|Concepto|Descripción|Prioridad|
-|---|---|---|
-|Weak spacing collapse|Margins entre elementos: `max()` en vez de sumar|Media|
-|`<ul>`/`<ol>` como Multi|Partir listas por `<li>` boundaries|Media|
-|`<blockquote>` como Multi|Partir blockquotes por párrafos internos|Baja|
-|Checkpoint/rollback|Guardar estado antes de inserciones complejas|Baja|
-
-### Lo que NO es portable de Typst
-
-- **Knuth-Plass line breaking** — Typst lo usa para texto justificado. Nosotros delegamos en el browser.
-- **Glyph-level measurement** — Typst usa HarfBuzz. Nosotros medimos DOM renderizado.
-- **El layout engine completo** — Typst calcula posiciones él mismo. Nosotros medimos después del hecho.
-
-### Referencias Typst (open source)
-
-- Repo principal: https://github.com/typst/typst
-- `pdf-writer` — librería Rust para escribir PDFs: https://github.com/typst/pdf-writer
-- `typst-render` — rasterización de páginas: https://crates.io/crates/typst-render
+Si un heading (`<h1>`–`<h6>`) cabe al final de una página pero el siguiente elemento no cabe después, el heading migra a la siguiente página. Evita headings huérfanos al final de página sin contenido debajo.
 
 ---
 
@@ -283,4 +228,10 @@ Estudiamos el código fuente de Typst (`crates/typst-layout/src/`) para extraer 
 
 **Opción B — Iframe con `/print`:** Cargar contenido en `<iframe>` apuntando a `/print`. Consultar posiciones dentro del iframe. Garantía perfecta de coincidencia preview ↔ PDF porque ambos usan el mismo código de render. Complejidad: comunicación cross-frame.
 
-**Opción C — Layout engine propio (largo plazo):** Calcular posición de cada elemento durante la fase de evaluación del parser, análogo a Typst. Factible cuando tengamos control total de los componentes `.isle`.
+**Mejoras pendientes al particionado:**
+
+|Mejora|Descripción|Prioridad|
+|---|---|---|
+|Weak spacing collapse|Margins entre elementos: `max()` en vez de sumar|Media|
+|`<ul>`/`<ol>` partibles|Partir listas por `<li>` boundaries|Media|
+|`<blockquote>` partibles|Partir blockquotes por párrafos internos|Baja|
