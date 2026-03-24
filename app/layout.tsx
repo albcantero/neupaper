@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
-import { Inter, Victor_Mono } from "next/font/google";
+import { Victor_Mono } from "next/font/google";
 import "./globals.css";
-
-const inter = Inter({
-  variable: "--font-sans",
-  subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-});
 
 const victorMono = Victor_Mono({
   variable: "--font-mono",
@@ -28,9 +22,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${victorMono.variable} h-full antialiased dark`}
+      className={`${victorMono.variable} h-full antialiased dark`}
     >
-      <body className="h-full flex flex-col overflow-hidden">
+      <body className="h-full flex flex-col">
         {children}
       </body>
     </html>

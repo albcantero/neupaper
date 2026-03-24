@@ -1,24 +1,23 @@
-"use client";
-
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Hero } from "@/components/landing/hero";
+import { Features } from "@/components/landing/features";
+import { Bento } from "@/components/landing/bento";
+import { Footer } from "@/components/landing/footer";
+import { GuideLines } from "@/components/landing/guide-lines";
 
 export default function Home() {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-8 px-4">
-      <div className="flex flex-col items-center gap-4 text-center">
-        <h1 className="text-5xl font-bold tracking-tight">Neupaper</h1>
-        <p className="text-lg text-muted-foreground max-w-md">
-          Dynamic documents that think.
-          <br />
-          <span className="text-sm italic">
-            Small islands of logic in a sea of Markdown.
-          </span>
-        </p>
+    <div className="min-h-full overflow-y-auto relative">
+      <GuideLines />
+
+      <div className="relative z-10">
+        <Hero />
+        <div className="w-full h-px bg-border" />
+        <Features />
+        <div className="w-full h-px bg-border" />
+        <Bento />
+        <div className="w-full h-px bg-border" />
+        <Footer />
       </div>
-      <Button asChild size="lg">
-        <Link href="/vault">Abrir vault</Link>
-      </Button>
     </div>
   );
 }

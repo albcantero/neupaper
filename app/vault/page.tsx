@@ -3,10 +3,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { getFiles, getVaultFiles, createFile, createVaultFile, deleteFile, updateFile, renameFolder, initVault, type NeuFile } from "@/lib/storage";
 import { NEU_EDITOR_BG } from "@/lib/editor/neu-theme";
-import { VaultSidebar } from "@/components/sidebar";
-import { Editor } from "@/components/editor";
-import { EditorTabs } from "@/components/editor-tabs";
-import { Preview } from "@/components/preview";
+import { VaultSidebar } from "@/components/vault/sidebar";
+import { Editor } from "@/components/vault/editor";
+import { EditorTabs } from "@/components/vault/editor-tabs";
+import { Preview } from "@/components/vault/preview";
 import {
   ResizablePanelGroup,
   ResizablePanel,
@@ -153,7 +153,7 @@ export default function VaultPage() {
     .filter((f): f is NeuFile => f !== undefined);
 
   return (
-    <SidebarProvider className="min-h-0 flex-1 overflow-hidden" style={{ "--sidebar": "var(--background)" } as React.CSSProperties}>
+    <SidebarProvider className="min-h-0 flex-1 overflow-hidden font-[family-name:var(--font-vault)]" style={{ "--sidebar": "var(--background)" } as React.CSSProperties}>
       <VaultSidebar
         files={allFiles}
         openFiles={openFiles}
