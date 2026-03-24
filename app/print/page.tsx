@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "@/app/neu-document.css";
+import "@/app/vault/themes/neu-document.css";
 
 export const metadata: Metadata = {
   robots: "noindex",

@@ -3,10 +3,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { getFiles, getVaultFiles, createFile, createVaultFile, deleteFile, updateFile, renameFolder, initVault, type NeuFile } from "@/lib/storage";
 import { NEU_EDITOR_BG } from "@/lib/editor/neu-theme";
-import { VaultSidebar } from "@/components/vault/sidebar";
-import { Editor } from "@/components/vault/editor";
-import { EditorTabs } from "@/components/vault/editor-tabs";
-import { Preview } from "@/components/vault/preview";
+import { VaultSidebar } from "@/components/vault/Sidebar";
+import { Editor } from "@/components/vault/Editor";
+import { EditorTabs } from "@/components/vault/EditorTabs";
+import { Preview } from "@/components/vault/Preview";
 import {
   ResizablePanelGroup,
   ResizablePanel,

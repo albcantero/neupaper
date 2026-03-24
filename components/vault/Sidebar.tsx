@@ -41,7 +41,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import type { NeuFile } from "@/lib/storage";
-import { fileIcon } from "@/components/vault/file-icon";
+import { fileIcon } from "@/components/vault/FileIcon";
 import {
   Collapsible,
   CollapsibleContent,

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { HeroGrid } from "@/components/landing/hero-grid";
+import { HeroGrid } from "@/components/landing/HeroGrid";
 
 export function Hero() {
   return (

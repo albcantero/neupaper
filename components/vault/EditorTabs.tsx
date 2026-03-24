@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, Fragment } from "react";
 import { X, Settings } from "lucide-react";
-import { fileIcon } from "@/components/vault/file-icon";
+import { fileIcon } from "@/components/vault/FileIcon";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";

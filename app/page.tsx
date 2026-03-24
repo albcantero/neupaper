@@ -1,8 +1,8 @@
-import { Hero } from "@/components/landing/hero";
-import { Features } from "@/components/landing/features";
-import { Bento } from "@/components/landing/bento";
-import { Footer } from "@/components/landing/footer";
-import { GuideLines } from "@/components/landing/guide-lines";
+import { Hero } from "@/components/landing/Hero";
+import { Features } from "@/components/landing/Features";
+import { Bento } from "@/components/landing/Bento";
+import { Footer } from "@/components/landing/Footer";
+import { GuideLines } from "@/components/landing/GuideLines";
 
 export default function Home() {
   return (
