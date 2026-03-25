@@ -1,12 +1,28 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback, Fragment } from "react";
-import { X, Settings } from "lucide-react";
+import { X, Settings, CircleCheck, CircleDashed, Ban } from "lucide-react";
 import { fileIcon } from "@/components/vault/FileIcon";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Toggle } from "@/components/ui/toggle";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/ui/combobox";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -16,17 +32,46 @@ import {
 } from "@/components/ui/breadcrumb";
 import type { NeuFile } from "@/lib/storage";
 
+export const EDITOR_THEMES = [
+  { id: "dark", label: "Neupaper" },
+] as const;
+
+export const EDITOR_FONTS = [
+  { id: "writer", label: "Writer", family: "Writer", hasLigatures: false, hasSS: true },
+  { id: "azeret", label: "Azeret", family: "Azeret Mono", hasLigatures: true, hasSS: true },
+  { id: "commit", label: "Commit", family: "Commit Mono", hasLigatures: true, hasSS: false },
+  { id: "cousine", label: "Cousine", family: "Cousine", hasLigatures: false, hasSS: false },
+  { id: "dm", label: "DM Mono", family: "DM Mono", hasLigatures: false, hasSS: true },
+  { id: "drafting", label: "Drafting", family: "Drafting Mono", hasLigatures: false, hasSS: false },
+  { id: "jetbrains", label: "JetBrains", family: "JetBrains Mono", hasLigatures: true, hasSS: true },
+  { id: "meslo", label: "Meslo", family: "Meslo LGS", hasLigatures: false, hasSS: false },
+  { id: "office-code", label: "Office", family: "Office Code Pro", hasLigatures: false, hasSS: false },
+  { id: "victor", label: "Victor", family: "Victor Mono", hasLigatures: true, hasSS: true },
+] as const;
+
+export type EditorThemeId = (typeof EDITOR_THEMES)[number]["id"];
+export type EditorFontId = (typeof EDITOR_FONTS)[number]["id"];
+
 interface EditorTabsProps {
   openFiles: NeuFile[];
   activeId: string | null;
   activeFile: NeuFile;
   onSelect: (id: string) => void;
   onClose: (id: string) => void;
+  editorTheme: EditorThemeId;
+  editorFont: EditorFontId;
+  editorFontSize: number;
+  editorLigatures: boolean;
+  editorAltChars: boolean;
+  onEditorThemeChange: (theme: EditorThemeId) => void;
+  onEditorFontChange: (font: EditorFontId) => void;
+  onEditorFontSizeChange: (size: number) => void;
+  onEditorLigaturesChange: (enabled: boolean) => void;
+  onEditorAltCharsChange: (enabled: boolean) => void;
 }
 
-export function EditorTabs({ openFiles, activeId, activeFile, onSelect, onClose }: EditorTabsProps) {
+export function EditorTabs({ openFiles, activeId, activeFile, onSelect, onClose, editorTheme, editorFont, editorFontSize, editorLigatures, editorAltChars, onEditorThemeChange, onEditorFontChange, onEditorFontSizeChange, onEditorLigaturesChange, onEditorAltCharsChange }: EditorTabsProps) {
   const [vaultName, setVaultName] = useState("My Vault");
-
   useEffect(() => {
     const saved = localStorage.getItem("neupaper:vault-name");
     if (saved) setVaultName(saved);
@@ -59,6 +104,9 @@ export function EditorTabs({ openFiles, activeId, activeFile, onSelect, onClose 
   }, [updateFades, openFiles]);
 
   const segments = activeFile.path.split("/");
+
+  const themeLabels = EDITOR_THEMES.map((t) => t.label);
+  const fontLabels = EDITOR_FONTS.map((f) => f.label);
 
   return (
     <div className="flex flex-col">
@@ -107,9 +155,166 @@ export function EditorTabs({ openFiles, activeId, activeFile, onSelect, onClose 
         </div>
 
         <Separator orientation="vertical" className="data-[orientation=vertical]:h-4 ml-3 mt-[7px]" />
-        <Button variant="ghost" size="icon" className="shrink-0 h-7 w-7 ml-1 mt-[1px]">
-          <Settings className="h-4 w-4" />
-        </Button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" size="icon" className="shrink-0 h-7 w-7 ml-1 mt-[1px]">
+              <Settings className="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-80 font-[family-name:var(--font-vault)]">
+            <div className="grid gap-4">
+              <div className="space-y-0">
+                <div className="flex items-center justify-between gap-2">
+                  <h4 className="leading-none font-medium">Editor settings</h4>
+                  <Button
+                    variant="secondary"
+                    className="h-7 rounded-full px-2 py-1 text-xs"
+                    onClick={() => {
+                      onEditorThemeChange(EDITOR_THEMES[0].id);
+                      onEditorFontChange(EDITOR_FONTS[0].id);
+                      onEditorFontSizeChange(14);
+                      onEditorLigaturesChange(true);
+                      onEditorAltCharsChange(false);
+                    }}
+                  >
+                  Reset all
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground">Customize the editor appearance.</p>
+              </div>
+              <div className="grid gap-2">
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <Label>Theme</Label>
+                  <div className="col-span-2">
+                    <Combobox
+                      items={themeLabels}
+                      value={EDITOR_THEMES.find((t) => t.id === editorTheme)?.label ?? null}
+                      onValueChange={(val) => {
+                        const theme = EDITOR_THEMES.find((t) => t.label === val);
+                        if (theme) onEditorThemeChange(theme.id);
+                      }}
+                    >
+                      <ComboboxInput placeholder="Select theme" showClear />
+                      <ComboboxContent>
+                        <ComboboxEmpty>No themes found.</ComboboxEmpty>
+                        <ComboboxList>
+                          {(item) => {
+                            const theme = EDITOR_THEMES.find((t) => t.label === item);
+                            return (
+                              <ComboboxItem key={item} value={item}>
+                                <span className="flex-1">{item}</span>
+                                {theme?.id === "dark" && <span className="ml-auto text-muted-foreground font-sans text-[10px] italic">(default)</span>}
+                              </ComboboxItem>
+                            );
+                          }}
+                        </ComboboxList>
+                      </ComboboxContent>
+                    </Combobox>
+                  </div>
+                </div>
+                <Separator />
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <Label>Font</Label>
+                  <div className="col-span-2 flex items-center gap-2">
+                    <div
+                      className="flex-1 min-w-0 [&_input]:text-[11px] [&_input]:leading-none [&_input]:truncate"
+                      style={{ fontFamily: EDITOR_FONTS.find((f) => f.id === editorFont)?.family }}
+                    >
+                      <Combobox
+                        items={fontLabels}
+                        value={EDITOR_FONTS.find((f) => f.id === editorFont)?.label ?? null}
+                        onValueChange={(val) => {
+                          const font = EDITOR_FONTS.find((f) => f.label === val);
+                          if (font) onEditorFontChange(font.id);
+                        }}
+                      >
+                        <ComboboxInput placeholder="Select font" showClear />
+                        <ComboboxContent>
+                          <ComboboxEmpty>No fonts found.</ComboboxEmpty>
+                          <ComboboxList>
+                            {(item) => {
+                              const font = EDITOR_FONTS.find((f) => f.label === item);
+                              return (
+                                <ComboboxItem key={item} value={item} className="truncate" style={{ fontFamily: font?.family, fontSize: "11px" }}>
+                                  <span className="flex-1">{item}</span>
+                                  {font?.id === "writer" && <span className="ml-auto text-muted-foreground font-sans text-[10px] italic">(default)</span>}
+                                </ComboboxItem>
+                              );
+                            }}
+                          </ComboboxList>
+                        </ComboboxContent>
+                      </Combobox>
+                    </div>
+                    <Input
+                      key={editorFontSize}
+                      type="text"
+                      inputMode="numeric"
+                      defaultValue={editorFontSize}
+                      onBlur={(e) => {
+                        const v = parseInt(e.target.value, 10);
+                        const clamped = isNaN(v) ? 14 : Math.max(8, Math.min(32, v));
+                        e.target.value = String(clamped);
+                        onEditorFontSizeChange(clamped);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") e.currentTarget.blur();
+                      }}
+                      className="w-12 h-8 text-center tabular-nums caret-foreground"
+                    />
+                  </div>
+                </div>
+                {(() => {
+                  const currentFont = EDITOR_FONTS.find((f) => f.id === editorFont);
+                  return (
+                    <div className="grid grid-cols-3 items-center gap-4">
+                      <Label>&nbsp;</Label>
+                      <div className="col-span-2 flex items-center gap-2">
+                        <Toggle
+                          aria-label="Toggle ligatures"
+                          variant="outline"
+                          size="sm"
+                          className="font-normal text-xs transition-transform duration-150 active:scale-95"
+                          pressed={editorLigatures}
+                          onPressedChange={onEditorLigaturesChange}
+                          disabled={!currentFont?.hasLigatures}
+                        >
+                          <span className="relative size-4 shrink-0">
+                            {!currentFont?.hasLigatures ? <Ban className="absolute inset-0" /> : (
+                              <>
+                                <CircleDashed className={`absolute inset-0 transition-opacity duration-200 ${editorLigatures ? "opacity-0" : "opacity-100"}`} />
+                                <CircleCheck className={`absolute inset-0 transition-opacity duration-200 ${editorLigatures ? "opacity-100" : "opacity-0"}`} />
+                              </>
+                            )}
+                          </span>
+                          Ligatures
+                        </Toggle>
+                        <Toggle
+                          aria-label="Toggle stylistic set"
+                          variant="outline"
+                          size="sm"
+                          className="font-normal text-xs transition-transform duration-150 active:scale-95"
+                          pressed={editorAltChars}
+                          onPressedChange={onEditorAltCharsChange}
+                          disabled={!currentFont?.hasSS}
+                        >
+                          <span className="relative size-4 shrink-0">
+                            {!currentFont?.hasSS ? <Ban className="absolute inset-0" /> : (
+                              <>
+                                <CircleDashed className={`absolute inset-0 transition-opacity duration-200 ${editorAltChars ? "opacity-0" : "opacity-100"}`} />
+                                <CircleCheck className={`absolute inset-0 transition-opacity duration-200 ${editorAltChars ? "opacity-100" : "opacity-0"}`} />
+                              </>
+                            )}
+                          </span>
+                          Stylistic set
+                        </Toggle>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
 
       <div className="px-4 py-1.5 border-b bg-card">

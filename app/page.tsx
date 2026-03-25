@@ -6,7 +6,7 @@ import { GuideLines } from "@/components/landing/GuideLines";
 
 export default function Home() {
   return (
-    <div className="min-h-full overflow-y-auto relative">
+    <div className="min-h-full overflow-y-auto relative font-[family-name:var(--font-display)]">
       <GuideLines />
 
       <div className="relative z-10">

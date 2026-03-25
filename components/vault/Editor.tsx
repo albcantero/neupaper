@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { EditorState } from "@codemirror/state";
+import { EditorState, Compartment } from "@codemirror/state";
 import { EditorView, Decoration, keymap, lineNumbers, highlightActiveLine, highlightActiveLineGutter, ViewPlugin, DecorationSet, WidgetType } from "@codemirror/view";
 import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
@@ -103,13 +103,18 @@ function showLineBreaks() {
 interface EditorProps {
   content: string;
   onChange: (content: string) => void;
+  fontFamily?: string;
+  fontSize?: number;
+  ligatures?: boolean;
+  altChars?: boolean;
 }
 
-export function Editor({ content, onChange }: EditorProps) {
+export function Editor({ content, onChange, fontFamily = "var(--font-mono)", fontSize = 14, ligatures = true, altChars = false }: EditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
+  const fontCompartment = useRef(new Compartment());
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -146,10 +151,12 @@ export function Editor({ content, onChange }: EditorProps) {
         showIndentSpaces(),
         showLineBreaks(),
         EditorView.lineWrapping,
+        fontCompartment.current.of(EditorView.theme({
+          "&": { height: "100%", fontSize: `${fontSize}px` },
+          ".cm-scroller": { overflow: "auto", fontFamily: `${fontFamily}, monospace`, fontFeatureSettings: `"liga" ${ligatures ? 1 : 0}, "calt" ${ligatures ? 1 : 0}, "ss01" ${altChars ? 1 : 0}, "ss02" ${altChars ? 1 : 0}, "ss03" ${altChars ? 1 : 0}, "ss04" ${altChars ? 1 : 0}, "ss05" ${altChars ? 1 : 0}` },
+          ".cm-content": { padding: "16px 0", fontFamily: `${fontFamily}, monospace`, fontFeatureSettings: `"liga" ${ligatures ? 1 : 0}, "calt" ${ligatures ? 1 : 0}, "ss01" ${altChars ? 1 : 0}, "ss02" ${altChars ? 1 : 0}, "ss03" ${altChars ? 1 : 0}, "ss04" ${altChars ? 1 : 0}, "ss05" ${altChars ? 1 : 0}` },
+        })),
         EditorView.theme({
-          "&": { height: "100%", fontSize: "14px" },
-          ".cm-scroller": { overflow: "auto", fontFamily: "var(--font-mono), monospace" },
-          ".cm-content": { padding: "16px 0", fontFamily: "var(--font-mono), monospace" },
           ".cm-scroller::-webkit-scrollbar": { width: "12px", height: "12px" },
           ".cm-scroller::-webkit-scrollbar-track": { background: "transparent" },
           ".cm-scroller::-webkit-scrollbar-thumb": { background: "var(--border)", borderRadius: "9999px", border: "4px solid transparent", backgroundClip: "padding-box" },
@@ -168,6 +175,17 @@ export function Editor({ content, onChange }: EditorProps) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!viewRef.current) return;
+    viewRef.current.dispatch({
+      effects: fontCompartment.current.reconfigure(EditorView.theme({
+        "&": { height: "100%", fontSize: `${fontSize}px` },
+        ".cm-scroller": { overflow: "auto", fontFamily: `${fontFamily}, monospace`, fontFeatureSettings: `"liga" ${ligatures ? 1 : 0}, "calt" ${ligatures ? 1 : 0}, "ss01" ${altChars ? 1 : 0}, "ss02" ${altChars ? 1 : 0}, "ss03" ${altChars ? 1 : 0}, "ss04" ${altChars ? 1 : 0}, "ss05" ${altChars ? 1 : 0}` },
+        ".cm-content": { padding: "16px 0", fontFamily: `${fontFamily}, monospace`, fontFeatureSettings: `"liga" ${ligatures ? 1 : 0}, "calt" ${ligatures ? 1 : 0}, "ss01" ${altChars ? 1 : 0}, "ss02" ${altChars ? 1 : 0}, "ss03" ${altChars ? 1 : 0}, "ss04" ${altChars ? 1 : 0}, "ss05" ${altChars ? 1 : 0}` },
+      })),
+    });
+  }, [fontFamily, fontSize, ligatures, altChars]);
 
   return <div ref={containerRef} className="h-full w-full" />;
 }

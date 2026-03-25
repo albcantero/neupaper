@@ -5,7 +5,7 @@ import { getFiles, getVaultFiles, createFile, createVaultFile, deleteFile, updat
 import { NEU_EDITOR_BG } from "@/lib/editor/neu-theme";
 import { VaultSidebar } from "@/components/vault/Sidebar";
 import { Editor } from "@/components/vault/Editor";
-import { EditorTabs } from "@/components/vault/EditorTabs";
+import { EditorTabs, EDITOR_THEMES, EDITOR_FONTS, type EditorThemeId, type EditorFontId } from "@/components/vault/EditorTabs";
 import { Preview } from "@/components/vault/Preview";
 import {
   ResizablePanelGroup,
@@ -25,6 +25,59 @@ export default function VaultPage() {
   const [openIds, setOpenIds] = useState<string[]>([]);
   const [liveContent, setLiveContent] = useState("");
   const [handleHovered, setHandleHovered] = useState(false);
+  const [editorTheme, setEditorTheme] = useState<EditorThemeId>(() => {
+    if (typeof window !== "undefined") {
+      return (localStorage.getItem("neupaper:editor-theme") as EditorThemeId) || EDITOR_THEMES[0].id;
+    }
+    return EDITOR_THEMES[0].id;
+  });
+  const [editorFont, setEditorFont] = useState<EditorFontId>(() => {
+    if (typeof window !== "undefined") {
+      return (localStorage.getItem("neupaper:editor-font") as EditorFontId) || EDITOR_FONTS[0].id;
+    }
+    return EDITOR_FONTS[0].id;
+  });
+
+  const handleEditorThemeChange = (theme: EditorThemeId) => {
+    setEditorTheme(theme);
+    localStorage.setItem("neupaper:editor-theme", theme);
+  };
+
+  const [editorFontSize, setEditorFontSize] = useState<number>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("neupaper:editor-font-size");
+      return saved ? parseInt(saved, 10) : 14;
+    }
+    return 14;
+  });
+
+  const handleEditorFontChange = (font: EditorFontId) => {
+    setEditorFont(font);
+    localStorage.setItem("neupaper:editor-font", font);
+  };
+
+  const [editorLigatures, setEditorLigatures] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("neupaper:editor-ligatures") !== "false";
+    }
+    return true;
+  });
+  const [editorAltChars, setEditorAltChars] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("neupaper:editor-alt-chars") === "true";
+    }
+    return false;
+  });
+
+  const handleEditorFontSizeChange = (size: number) => {
+    setEditorFontSize(size);
+    localStorage.setItem("neupaper:editor-font-size", String(size));
+  };
+
+  const handleEditorLigaturesChange = (enabled: boolean) => {
+    setEditorLigatures(enabled);
+    localStorage.setItem("neupaper:editor-ligatures", String(enabled));
+  };
 
   const refresh = () => {
     setFiles(getFiles());
@@ -183,12 +236,26 @@ export default function VaultPage() {
                   activeFile={activeFile}
                   onSelect={setActiveId}
                   onClose={handleCloseTab}
+                  editorTheme={editorTheme}
+                  editorFont={editorFont}
+                  onEditorThemeChange={handleEditorThemeChange}
+                  editorFontSize={editorFontSize}
+                  onEditorFontChange={handleEditorFontChange}
+                  onEditorFontSizeChange={handleEditorFontSizeChange}
+                  editorLigatures={editorLigatures}
+                  editorAltChars={editorAltChars}
+                  onEditorLigaturesChange={handleEditorLigaturesChange}
+                  onEditorAltCharsChange={(enabled) => { setEditorAltChars(enabled); localStorage.setItem("neupaper:editor-alt-chars", String(enabled)); }}
                 />
                 <div className="flex-1 min-h-0 overflow-hidden pb-2" style={{ backgroundColor: NEU_EDITOR_BG }}>
                   <Editor
                     key={activeFile.id}
                     content={activeFile.content}
                     onChange={handleContentChange}
+                    fontFamily={EDITOR_FONTS.find((f) => f.id === editorFont)?.family}
+                    fontSize={editorFontSize}
+                    ligatures={editorLigatures}
+                    altChars={editorAltChars}
                   />
                 </div>
               </Card>
