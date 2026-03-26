@@ -1,7 +1,35 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback, Fragment } from "react";
-import { X, Settings, CircleCheck, CircleDashed, Ban } from "lucide-react";
+import { IconX, IconSettings, IconBan } from "@tabler/icons-react";
+import { motion, AnimatePresence } from "framer-motion";
+
+function AnimatedCheck({ className }: { className?: string }) {
+  return (
+    <motion.svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={16}
+      height={16}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: [0.8, 1.1, 1], opacity: 1 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+    >
+      <motion.path
+        d="m4 12 5 5L20 6"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+      />
+    </motion.svg>
+  );
+}
 import { fileIcon } from "@/components/vault/FileIcon";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -110,7 +138,7 @@ export function EditorTabs({ openFiles, activeId, activeFile, onSelect, onClose,
 
   return (
     <div className="flex flex-col">
-      <div className="flex items-start border-b border-border/50 px-2 py-2 bg-card">
+      <div className="flex items-start border-b border-border/50 px-2 py-2 bg-card [&_svg.tabler-icon]:stroke-[1.75]">
         <SidebarTrigger className="shrink-0 mr-1 mt-[1px]" />
         <Separator orientation="vertical" className="data-[orientation=vertical]:h-4 mr-3 mt-[7px]" />
 
@@ -145,7 +173,7 @@ export function EditorTabs({ openFiles, activeId, activeFile, onSelect, onClose,
                       onKeyDown={(e) => { if (e.key === "Enter") { e.stopPropagation(); onClose(file.id); } }}
                       className="opacity-0 group-hover:opacity-100 ml-0.5 rounded hover:text-destructive transition-colors"
                     >
-                      <X className="h-3 w-3" />
+                      <IconX className="h-3 w-3" />
                     </span>
                   </TabsTrigger>
                 ))}
@@ -158,10 +186,10 @@ export function EditorTabs({ openFiles, activeId, activeFile, onSelect, onClose,
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="ghost" size="icon" className="shrink-0 h-7 w-7 ml-1 mt-[1px]">
-              <Settings className="h-4 w-4" />
+              <IconSettings className="h-4 w-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent align="end" className="w-80 font-[family-name:var(--font-vault)]">
+          <PopoverContent align="end" className="w-80 font-[family-name:var(--font-vault)] [&_svg.tabler-icon]:stroke-[1.75]">
             <div className="grid gap-4">
               <div className="space-y-0">
                 <div className="flex items-center justify-between gap-2">
@@ -269,42 +297,44 @@ export function EditorTabs({ openFiles, activeId, activeFile, onSelect, onClose,
                     <div className="grid grid-cols-3 items-center gap-4">
                       <Label>&nbsp;</Label>
                       <div className="col-span-2 flex items-center gap-2">
+                        {/* ── Option A: slide-reveal icon on hover (ButtonGroupReveal pattern)
+                         * off + no hover: icon collapses to w-0, gap closes → text only
+                         * off + hover: icon expands to w-4, gap opens → smooth slide push
+                         * on: IconCircleCheck always visible
+                         * disabled: IconBan always visible
+                         * Uses: not-data-[state=on]:not-hover: to target "off & not hovered"
+                         *       transition-all duration-200 on both Toggle and SVG for smooth animation
+                         */}
                         <Toggle
                           aria-label="Toggle ligatures"
                           variant="outline"
                           size="sm"
-                          className="font-normal text-xs transition-transform duration-150 active:scale-95"
+                          className="font-normal text-xs justify-start gap-0 overflow-hidden shadow-none transition-all duration-200 active:scale-95 focus-visible:z-10"
                           pressed={editorLigatures}
                           onPressedChange={onEditorLigaturesChange}
                           disabled={!currentFont?.hasLigatures}
                         >
-                          <span className="relative size-4 shrink-0">
-                            {!currentFont?.hasLigatures ? <Ban className="absolute inset-0" /> : (
-                              <>
-                                <CircleDashed className={`absolute inset-0 transition-opacity duration-200 ${editorLigatures ? "opacity-0" : "opacity-100"}`} />
-                                <CircleCheck className={`absolute inset-0 transition-opacity duration-200 ${editorLigatures ? "opacity-100" : "opacity-0"}`} />
-                              </>
-                            )}
-                          </span>
+                          {!currentFont?.hasLigatures ? <IconBan /> : (
+                            <span className={`inline-flex shrink-0 overflow-hidden transition-all duration-200 ${editorLigatures ? "w-4 mr-1.5" : "w-0 mr-0"}`}>
+                              {editorLigatures && <AnimatedCheck />}
+                            </span>
+                          )}
                           Ligatures
                         </Toggle>
                         <Toggle
                           aria-label="Toggle stylistic set"
                           variant="outline"
                           size="sm"
-                          className="font-normal text-xs transition-transform duration-150 active:scale-95"
+                          className="font-normal text-xs justify-start gap-0 overflow-hidden shadow-none transition-all duration-200 active:scale-95 focus-visible:z-10"
                           pressed={editorAltChars}
                           onPressedChange={onEditorAltCharsChange}
                           disabled={!currentFont?.hasSS}
                         >
-                          <span className="relative size-4 shrink-0">
-                            {!currentFont?.hasSS ? <Ban className="absolute inset-0" /> : (
-                              <>
-                                <CircleDashed className={`absolute inset-0 transition-opacity duration-200 ${editorAltChars ? "opacity-0" : "opacity-100"}`} />
-                                <CircleCheck className={`absolute inset-0 transition-opacity duration-200 ${editorAltChars ? "opacity-100" : "opacity-0"}`} />
-                              </>
-                            )}
-                          </span>
+                          {!currentFont?.hasSS ? <IconBan /> : (
+                            <span className={`inline-flex shrink-0 overflow-hidden transition-all duration-200 ${editorAltChars ? "w-4 mr-1.5" : "w-0 mr-0"}`}>
+                              {editorAltChars && <AnimatedCheck />}
+                            </span>
+                          )}
                           Stylistic set
                         </Toggle>
                       </div>

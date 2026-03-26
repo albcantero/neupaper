@@ -1,7 +1,7 @@
 "use client";
 
 import { Lora, Geist, Nunito, EB_Garamond, IBM_Plex_Mono } from "next/font/google";
-import { FileHeart, Brain, Check, CaseSensitive } from "lucide-react";
+import { IconFileText, IconBrain, IconCheck, IconTypography } from "@tabler/icons-react";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -63,7 +63,7 @@ function CardCarousel({ tick }: { tick: number }) {
                   exit={{ opacity: 0 }}
                   transition={{ delay: 0.25, duration: 0.2 }}
                 >
-                  <Check className="size-3 shrink-0" />
+                  <IconCheck className="size-3 shrink-0" />
                 </motion.span>
               )}
             </AnimatePresence>
@@ -106,7 +106,7 @@ export function Features() {
       <div className="flex flex-col md:flex-row">
         <div className="flex-1 flex flex-col gap-4 pt-10 md:pr-12">
           <Badge variant="outline" className="w-fit gap-1.5 font-normal">
-            <FileHeart className="size-3" />
+            <IconFileText className="size-3" />
             Beautiful output from Markdown
           </Badge>
           <h2 className="text-2xl font-semibold">Meet Neupaper. <span className="text-muted-foreground">A minimalist open-source text editor.</span></h2>
@@ -138,7 +138,7 @@ export function Features() {
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Badge variant="outline" className={`${activeTheme.fontLabel === "IBM Plex Mono" ? "text-[11px]" : "text-[12px]"} font-normal py-0 px-2 rounded-sm gap-1.5 h-6 ${activeTheme.fontClass}`}><CaseSensitive className="size-3" />{activeTheme.fontLabel}</Badge>
+                      <Badge variant="outline" className={`${activeTheme.fontLabel === "IBM Plex Mono" ? "text-[11px]" : "text-[12px]"} font-normal py-0 px-2 rounded-sm gap-1.5 h-6 ${activeTheme.fontClass}`}><IconTypography className="size-3" />{activeTheme.fontLabel}</Badge>
                     </motion.div>
                   </AnimatePresence>
                 </div>
@@ -149,7 +149,7 @@ export function Features() {
         <div className="hidden md:block w-px bg-border" />
         <div className="flex-1 flex flex-col gap-4 pt-10 md:pl-12">
           <Badge variant="outline" className="w-fit gap-1.5 font-normal">
-            <Brain className="size-3" />
+            <IconBrain className="size-3" />
             Dynamic documents that think
           </Badge>
           <h2 className="text-2xl font-semibold">Markdown Isles. <span className="text-muted-foreground">Small islands of logic in a sea of Markdown.</span></h2>

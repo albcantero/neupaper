@@ -18,7 +18,7 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
-import { ZoomIn, ZoomOut, Download } from "lucide-react";
+import { IconZoomIn, IconZoomOut, IconDownload } from "@tabler/icons-react";
 import { parse } from "@/lib/parser";
 import { partitionPages, type PageContent } from "@/lib/page-partitioner";
 
@@ -291,7 +291,7 @@ export function Preview({ content }: PreviewProps) {
       {/* Toolbar */}
       <div className="flex items-center gap-1 px-3 py-1.5 border-b bg-card">
         <Button variant="ghost" size="icon-xs" onClick={zoomOut} disabled={zoomIndex === 0}>
-          <ZoomOut className="h-3.5 w-3.5" />
+          <IconZoomOut className="h-3.5 w-3.5" />
         </Button>
         <button
           onClick={zoomReset}
@@ -300,7 +300,7 @@ export function Preview({ content }: PreviewProps) {
           {ZOOM_LABELS[zoomIndex]}%
         </button>
         <Button variant="ghost" size="icon-xs" onClick={zoomIn} disabled={zoomIndex === ZOOM_STEPS.length - 1}>
-          <ZoomIn className="h-3.5 w-3.5" />
+          <IconZoomIn className="h-3.5 w-3.5" />
         </Button>
 
         <div className="flex-1" />
@@ -329,7 +329,7 @@ export function Preview({ content }: PreviewProps) {
         <div className="flex-1" />
 
         <Button variant="ghost" size="icon-xs" onClick={exportPdf} disabled={exporting} title="Export PDF">
-          <Download className="h-3.5 w-3.5" />
+          <IconDownload className="h-3.5 w-3.5" />
         </Button>
       </div>
 

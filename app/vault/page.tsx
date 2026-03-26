@@ -113,7 +113,7 @@ export default function VaultPage() {
   };
 
   const handleCreate = () => {
-    const name = `untitled-${files.length + 1}.neu`;
+    const name = `untitled-${files.length + 1}.md`;
     const file = createFile(name);
     refresh();
     handleSelect(file.id);
@@ -134,8 +134,8 @@ export default function VaultPage() {
   const handleDuplicate = (file: NeuFile) => {
     const isRoot = !file.path.includes("/");
     if (isRoot) {
-      const base = file.name.replace(/\.neu$/, "");
-      const copy = createFile(`${base}-copy.neu`);
+      const base = file.name.replace(/\.md$/, "");
+      const copy = createFile(`${base}-copy.md`);
       updateFile(copy.id, { content: file.content });
     } else {
       const ext = file.name.includes(".") ? `.${file.name.split(".").pop()}` : "";
@@ -229,7 +229,7 @@ export default function VaultPage() {
           <ResizablePanelGroup orientation="horizontal" className="flex-1 h-full">
             <ResizablePanel defaultSize={50} minSize={30}>
               <div className={`h-full pt-2 pb-2 pl-2 transition-all duration-200 ${handleHovered ? "pr-3" : "pr-1"}`}>
-              <Card className="flex flex-col h-full overflow-hidden">
+              <Card className="flex flex-col gap-0 py-0 h-full overflow-hidden">
                 <EditorTabs
                   openFiles={openFiles}
                   activeId={activeId}
@@ -267,7 +267,7 @@ export default function VaultPage() {
             />
             <ResizablePanel defaultSize={50} minSize={20}>
               <div className={`h-full pt-2 pb-2 pr-2 transition-all duration-200 ${handleHovered ? "pl-3" : "pl-1"}`}>
-                <Card className="flex flex-col h-full overflow-hidden">
+                <Card className="flex flex-col gap-0 py-0 h-full overflow-hidden">
                   <Preview content={liveContent} />
                 </Card>
               </div>

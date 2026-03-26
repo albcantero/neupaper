@@ -7,9 +7,9 @@ export type { ASTNode } from "./ast";
 export type { Token } from "./tokenizer";
 
 /**
- * Parse a .neu source string and return clean Markdown.
+ * Parse a Markdown Isles source string and return clean Markdown.
  *
- * @param source  Raw .neu file content
+ * @param source  Raw .md file content (may contain ${ } blocks)
  * @param ctx     Data context — variables loaded from .data files or inline ${ data } blocks
  */
 export function parse(source: string, ctx: DataObject = {}): string {

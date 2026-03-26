@@ -2,37 +2,37 @@
 
 import { useState, useRef, useEffect } from "react";
 import {
-  FilePlus,
-  FolderPlus,
-  Waves,
-  ChevronRight,
-  Folder,
-  FolderOpen,
-  X,
-  Plus,
-  Minus,
-  Pencil,
-  Copy,
-  Download,
-  Trash2,
-  Palette,
-  Zap,
-  Archive,
-  BookOpen,
-  Briefcase,
-  Globe,
-  Package,
-  Rocket,
-  Star,
-  Box,
-  Bookmark,
-  FlaskConical,
-  Gem,
-  Volleyball,
-  Landmark,
-  BookUser,
-  FolderHeart,
-} from "lucide-react";
+  IconFilePlus,
+  IconFolderPlus,
+  IconWaveSine,
+  IconChevronRight,
+  IconFolder,
+  IconFolderOpen,
+  IconX,
+  IconPlus,
+  IconMinus,
+  IconPencil,
+  IconCopy,
+  IconDownload,
+  IconTrash,
+  IconPalette,
+  IconBolt,
+  IconArchive,
+  IconBook,
+  IconBriefcase,
+  IconWorld,
+  IconPackage,
+  IconRocket,
+  IconStar,
+  IconCube,
+  IconBookmark,
+  IconFlask,
+  IconDiamond,
+  IconBallFootball,
+  IconBuildingBank,
+  IconUserSearch,
+  IconHeartFilled,
+} from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -76,10 +76,10 @@ import {
 // ─── Vault icon picker ────────────────────────────────────────────
 
 const VAULT_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  Zap, Archive, BookOpen, Briefcase,
-  Globe, Package, Rocket, Star,
-  Box, Bookmark, FlaskConical, Gem,
-  Volleyball, Landmark, BookUser, FolderHeart,
+  IconBolt, IconArchive, IconBook, IconBriefcase,
+  IconWorld, IconPackage, IconRocket, IconStar,
+  IconCube, IconBookmark, IconFlask, IconDiamond,
+  IconBallFootball, IconBuildingBank, IconUserSearch, IconHeartFilled,
 };
 
 const VAULT_ICON_STORAGE_KEY = "neupaper:vault-icon";
@@ -224,20 +224,20 @@ function Tree({ nodes, activeId, onSelect, onDelete, onDuplicate, onNewInFolder,
                 </ContextMenuTrigger>
                 <ContextMenuContent className="w-48">
                   <ContextMenuItem onClick={() => onStartRename(node.file!)}>
-                    <Pencil className="h-3.5 w-3.5 mr-2 text-muted-foreground" />Rename
+                    <IconPencil className="h-3.5 w-3.5 mr-2 text-muted-foreground" />Rename
                   </ContextMenuItem>
                   <ContextMenuItem onClick={() => onDuplicate(node.file!)}>
-                    <Copy className="h-3.5 w-3.5 mr-2 text-muted-foreground" />Duplicate
+                    <IconCopy className="h-3.5 w-3.5 mr-2 text-muted-foreground" />Duplicate
                   </ContextMenuItem>
                   <ContextMenuItem onClick={() => handleDownload(node.file!)}>
-                    <Download className="h-3.5 w-3.5 mr-2 text-muted-foreground" />Download
+                    <IconDownload className="h-3.5 w-3.5 mr-2 text-muted-foreground" />Download
                   </ContextMenuItem>
                   <ContextMenuSeparator />
                   <ContextMenuItem
                     className="text-destructive data-[highlighted]:text-destructive data-[highlighted]:bg-destructive/10"
                     onClick={() => onDelete(node.file!.id)}
                   >
-                    <Trash2 className="h-3.5 w-3.5 mr-2" />Delete
+                    <IconTrash className="h-3.5 w-3.5 mr-2" />Delete
                   </ContextMenuItem>
                 </ContextMenuContent>
               </ContextMenu>
@@ -255,9 +255,9 @@ function Tree({ nodes, activeId, onSelect, onDelete, onDuplicate, onNewInFolder,
                 <ContextMenuTrigger asChild>
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton onDoubleClick={() => onStartFolderRename(node)}>
-                      <ChevronRight className="transition-transform" />
-                      <Folder />
-                      <FolderOpen />
+                      <IconChevronRight className="transition-transform" />
+                      <IconFolder />
+                      <IconFolderOpen />
                       {editingFolderPath === node.path ? (
                         <input
                           ref={folderInputRef}
@@ -311,27 +311,27 @@ function Tree({ nodes, activeId, onSelect, onDelete, onDuplicate, onNewInFolder,
               </Collapsible>
               <ContextMenuContent className="w-48">
                 <ContextMenuItem onClick={() => onNewInFolder(node.path)}>
-                  <FilePlus className="h-3.5 w-3.5 mr-2 text-muted-foreground" />New file here
+                  <IconFilePlus className="h-3.5 w-3.5 mr-2 text-muted-foreground" />New file here
                 </ContextMenuItem>
                 <ContextMenuItem onClick={() => onNewFolderIn(node.path)}>
-                  <FolderPlus className="h-3.5 w-3.5 mr-2 text-muted-foreground" />New folder here
+                  <IconFolderPlus className="h-3.5 w-3.5 mr-2 text-muted-foreground" />New folder here
                 </ContextMenuItem>
                 <ContextMenuSeparator />
                 <ContextMenuItem onClick={() => onStartFolderRename(node)}>
-                  <Pencil className="h-3.5 w-3.5 mr-2 text-muted-foreground" />Rename
+                  <IconPencil className="h-3.5 w-3.5 mr-2 text-muted-foreground" />Rename
                 </ContextMenuItem>
                 <ContextMenuItem onClick={() => onDuplicateFolder(node.path)}>
-                  <Copy className="h-3.5 w-3.5 mr-2 text-muted-foreground" />Duplicate
+                  <IconCopy className="h-3.5 w-3.5 mr-2 text-muted-foreground" />Duplicate
                 </ContextMenuItem>
                 <ContextMenuItem onClick={() => handleDownloadFolder(node)}>
-                  <Download className="h-3.5 w-3.5 mr-2 text-muted-foreground" />Download
+                  <IconDownload className="h-3.5 w-3.5 mr-2 text-muted-foreground" />Download
                 </ContextMenuItem>
                 <ContextMenuSeparator />
                 <ContextMenuItem
                   className="text-destructive data-[highlighted]:text-destructive data-[highlighted]:bg-destructive/10"
                   onClick={() => onDeleteFolder(node.path)}
                 >
-                  <Trash2 className="h-3.5 w-3.5 mr-2" />Delete
+                  <IconTrash className="h-3.5 w-3.5 mr-2" />Delete
                 </ContextMenuItem>
               </ContextMenuContent>
             </ContextMenu>
@@ -432,7 +432,7 @@ export function VaultSidebar({
   };
 
   // vault icon
-  const [vaultIcon, setVaultIcon] = useState("Zap");
+  const [vaultIcon, setVaultIcon] = useState("IconBolt");
   const [iconPickerOpen, setIconPickerOpen] = useState(false);
 
   useEffect(() => {
@@ -486,7 +486,7 @@ export function VaultSidebar({
   };
 
   return (
-    <Sidebar collapsible="offcanvas">
+    <Sidebar collapsible="offcanvas" className="[&_svg.tabler-icon]:stroke-[1.75]">
       <SidebarContent>
 
         {/* ── Open Files ── */}
@@ -512,7 +512,7 @@ export function VaultSidebar({
                       onClick={(e) => { e.stopPropagation(); onCloseTab(file.id); }}
                       title="Close"
                     >
-                      <X />
+                      <IconX />
                     </SidebarMenuAction>
                   </SidebarMenuItem>
                 ))
@@ -525,7 +525,7 @@ export function VaultSidebar({
         <SidebarGroup>
           <SidebarGroupLabel>Vault</SidebarGroupLabel>
           <SidebarGroupAction onClick={onCreate} title="New file">
-            <FilePlus />
+            <IconFilePlus />
           </SidebarGroupAction>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -580,25 +580,25 @@ export function VaultSidebar({
                           ) : (
                             vaultName
                           )}
-                          <Plus className="ml-auto group-data-[state=open]/collapsible:hidden" />
-                          <Minus className="ml-auto group-data-[state=closed]/collapsible:hidden" />
+                          <IconPlus className="ml-auto group-data-[state=open]/collapsible:hidden" />
+                          <IconMinus className="ml-auto group-data-[state=closed]/collapsible:hidden" />
                         </SidebarMenuButton>
                       </CollapsibleTrigger>
                     </ContextMenuTrigger>
                     <ContextMenuContent className="w-48">
                       <ContextMenuItem onClick={onCreate}>
-                        <FilePlus className="h-3.5 w-3.5 mr-2 text-muted-foreground" />New file here
+                        <IconFilePlus className="h-3.5 w-3.5 mr-2 text-muted-foreground" />New file here
                       </ContextMenuItem>
                       <ContextMenuItem onClick={() => handleNewFolderIn("")}>
-                        <FolderPlus className="h-3.5 w-3.5 mr-2 text-muted-foreground" />New folder here
+                        <IconFolderPlus className="h-3.5 w-3.5 mr-2 text-muted-foreground" />New folder here
                       </ContextMenuItem>
                       <ContextMenuSeparator />
                       <ContextMenuItem onClick={startVaultRename}>
-                        <Pencil className="h-3.5 w-3.5 mr-2 text-muted-foreground" />Rename
+                        <IconPencil className="h-3.5 w-3.5 mr-2 text-muted-foreground" />Rename
                       </ContextMenuItem>
                       <ContextMenuSub>
                         <ContextMenuSubTrigger>
-                          <Palette className="h-3.5 w-3.5 mr-2 text-muted-foreground" />Change icon
+                          <IconPalette className="h-3.5 w-3.5 mr-2 text-muted-foreground" />Change icon
                         </ContextMenuSubTrigger>
                         <ContextMenuSubContent className="w-36 p-2">
                           <div className="grid grid-cols-4 gap-1">
@@ -619,7 +619,7 @@ export function VaultSidebar({
                         </ContextMenuSubContent>
                       </ContextMenuSub>
                       <ContextMenuItem onClick={handleDownloadAll}>
-                        <Download className="h-3.5 w-3.5 mr-2 text-muted-foreground" />Download
+                        <IconDownload className="h-3.5 w-3.5 mr-2 text-muted-foreground" />Download
                       </ContextMenuItem>
                     </ContextMenuContent>
                   </ContextMenu>
@@ -666,10 +666,10 @@ export function VaultSidebar({
           </ContextMenuTrigger>
           <ContextMenuContent className="w-48">
             <ContextMenuItem onClick={onCreate}>
-              <FilePlus className="h-3.5 w-3.5 mr-2 text-muted-foreground" />New file here
+              <IconFilePlus className="h-3.5 w-3.5 mr-2 text-muted-foreground" />New file here
             </ContextMenuItem>
             <ContextMenuItem onClick={() => handleNewFolderIn("")}>
-              <FolderPlus className="h-3.5 w-3.5 mr-2 text-muted-foreground" />New folder here
+              <IconFolderPlus className="h-3.5 w-3.5 mr-2 text-muted-foreground" />New folder here
             </ContextMenuItem>
           </ContextMenuContent>
         </ContextMenu>

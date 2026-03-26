@@ -1,6 +1,6 @@
 import type { MarkdownConfig } from "@lezer/markdown";
 
-// ─── Custom Markdown extension for .neu files ───────────────────
+// ─── Custom Markdown extension for Markdown Isles ───────────────
 //
 // Prevents the Markdown parser from interpreting content inside
 // ${ ... } tokens (inline) and ${ data }...${ end data } blocks.

@@ -14,6 +14,9 @@ const neuEditorTheme = EditorView.theme(
       color: "#e2e2e2",
       backgroundColor: NEU_EDITOR_BG,
     },
+    "&.cm-focused": {
+      outline: "none",
+    },
     ".cm-content": {
       caretColor: "#ffffff",
     },

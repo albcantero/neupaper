@@ -15,7 +15,7 @@ export type Token = TextToken | IsleToken;
 // ─── Tokenizer ────────────────────────────────────────────────────
 
 /**
- * Splits a .neu source string into a flat list of tokens:
+ * Splits a Markdown Isles source string into a flat list of tokens:
  *   - "text" → raw Markdown (passed through as-is to Remark)
  *   - "isle" → content inside ${ … } (passed to the AST builder)
  *

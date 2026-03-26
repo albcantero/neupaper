@@ -1,7 +1,7 @@
 export interface NeuFile {
   id: string;
   name: string;
-  path: string; // "factura.neu" for root, "components/ui/Table.isle" for nested
+  path: string; // "factura.md" for root, "components/ui/Table.isle" for nested
   content: string;
   createdAt: number;
   updatedAt: number;
@@ -25,7 +25,7 @@ function writeAll(files: NeuFile[]): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(files));
 }
 
-/** Root .neu files (no subdirectory) */
+/** Root .md files (no subdirectory) */
 export function getFiles(): NeuFile[] {
   return readAll().filter((f) => !f.path.includes("/"));
 }
@@ -36,7 +36,7 @@ export function getVaultFiles(): NeuFile[] {
 }
 
 export function createFile(name: string): NeuFile {
-  const fileName = name.endsWith(".neu") ? name : `${name}.neu`;
+  const fileName = name.endsWith(".md") ? name : `${name}.md`;
   const file: NeuFile = {
     id: crypto.randomUUID(),
     name: fileName,
