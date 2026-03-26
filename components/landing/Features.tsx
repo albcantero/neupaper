@@ -16,10 +16,10 @@ const names = ["John Doe", "Acme Corp.", "Jane Smith", "Globex Inc.", "MarÃ­a LÃ
 const loopNames = [...names, names[0]];
 
 const cards = [
-  { id: "1", title: "Neupaper Default", fontLabel: "Geist", fontClass: geist.className, color: "#171717", muted: "#a3a3a3", bg: "#ffffff", accent: "#3b82f6" },
+  { id: "1", title: "Neupaper Default", fontLabel: "Geist", fontClass: geist.className, color: "#1a1535", muted: "#9b96b0", bg: "#fdfcfe", accent: "#6c5ce7" },
   { id: "2", title: "Serif Classic", fontLabel: "EB Garamond", fontClass: ebGaramond.className, color: "#292524", muted: "#a8a29e", bg: "#fafaf9", accent: "#b45309" },
   { id: "3", title: "Mono Technical", fontLabel: "IBM Plex Mono", fontClass: ibmPlexMono.className, color: "#e2e8f0", muted: "#64748b", bg: "#0f172a", accent: "#38bdf8" },
-  { id: "4", title: "Swiss Clean", fontLabel: "Nunito", fontClass: nunito.className, color: "#fafafa", muted: "#a3a3a3", bg: "#171717", accent: "#e11d48" },
+  { id: "4", title: "Swiss Clean", fontLabel: "Nunito", fontClass: nunito.className, color: "#f0eef5", muted: "#9b96b0", bg: "#1a1535", accent: "#e11d48" },
   { id: "5", title: "Editorial Warm", fontLabel: "Lora", fontClass: lora.className, color: "#451a03", muted: "#d6d3d1", bg: "#fffbeb", accent: "#d97706" },
   { id: "6", title: "Blueprint", fontLabel: "Geist", fontClass: geist.className, color: "#0f172a", muted: "#64748b", bg: "#f1f5f9", accent: "#1d4ed8" },
   { id: "7", title: "Paper Ivory", fontLabel: "Lora", fontClass: lora.className, color: "#1c1917", muted: "#78716c", bg: "#faf5ef", accent: "#92400e" },
@@ -50,7 +50,7 @@ function CardCarousel({ tick }: { tick: number }) {
             }}
             exit={{ y: -40, opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.6, ease: "easeInOut" }}
-            className="absolute left-1/2 -translate-x-1/2 w-36 px-2 py-2 rounded-md border border-foreground flex items-center justify-between bg-neutral-950"
+            className="absolute left-1/2 -translate-x-1/2 w-36 px-2 py-2 rounded-md border border-foreground flex items-center justify-between bg-card"
           >
             <span className="font-medium leading-normal select-none text-[10px]">
               {item.title}
@@ -102,7 +102,7 @@ export function Features() {
   }, [nameIndex]);
 
   return (
-    <section className="max-w-5xl mx-auto px-8">
+    <section className="max-w-5xl mx-auto px-8 bg-card">
       <div className="flex flex-col md:flex-row">
         <div className="flex-1 flex flex-col gap-4 pt-10 md:pr-12">
           <Badge variant="outline" className="w-fit gap-1.5 font-normal">
@@ -113,7 +113,7 @@ export function Features() {
           <p className="text-muted-foreground">
             Write Markdown and get pixel-perfect PDFs with our professional templates.
           </p>
-          <div className="mt-4 flex-1 flex rounded-t-lg border border-b-0 border-border overflow-hidden select-none bg-neutral-950">
+          <div className="mt-4 flex-1 flex rounded-t-lg border border-b-0 border-border overflow-hidden select-none bg-card">
             <div className="flex-1 flex items-center justify-center">
               <CardCarousel tick={tick} />
             </div>
@@ -146,7 +146,7 @@ export function Features() {
             })()}
           </div>
         </div>
-        <div className="hidden md:block w-px bg-border" />
+        <div className="hidden md:block w-px bg-input" />
         <div className="flex-1 flex flex-col gap-4 pt-10 md:pl-12">
           <Badge variant="outline" className="w-fit gap-1.5 font-normal">
             <IconBrain className="size-3" />
@@ -158,10 +158,10 @@ export function Features() {
           </p>
           <div className="mt-4 flex-1 flex rounded-t-lg border border-b-0 border-border overflow-hidden select-none">
             {/* Mini editor */}
-            <div className="flex-1 bg-neutral-950 p-3 flex items-center justify-center">
-              <div className="bg-neutral-950 border border-border rounded p-3 w-full font-[family-name:var(--font-mono)] leading-4 text-[10px]">
+            <div className="flex-1 bg-card p-3 flex items-center justify-center">
+              <div className="bg-card border border-border rounded p-3 w-full font-[family-name:var(--font-mono)] leading-4 text-[10px]">
                 <div className="flex">
-                  <div className="select-none text-[#555] pr-3 text-right">
+                  <div className="select-none text-muted-foreground pr-3 text-right">
                     <div>1</div>
                     <div>2</div>
                     <div>3</div>
@@ -178,8 +178,8 @@ export function Features() {
             </div>
             <div className="w-px bg-border" />
             {/* Mini preview */}
-            <div className="flex-1 bg-neutral-950 bg-[radial-gradient(#333_0.75px,transparent_0.75px)] bg-[length:10px_10px] p-5 pb-0 flex flex-col items-center justify-end">
-              <div className="bg-background border border-border border-b-0 pt-6 px-3 pb-[38px] text-foreground w-2/3 mt-auto" style={{ fontSize: "10px", lineHeight: "16px" }}>
+            <div className="flex-1 bg-card bg-[radial-gradient(var(--border)_0.75px,transparent_0.75px)] bg-[length:10px_10px] p-5 pb-0 flex flex-col items-center justify-end">
+              <div className="bg-card border border-border border-b-0 pt-6 px-3 pb-[38px] text-foreground w-2/3 mt-auto" style={{ fontSize: "10px", lineHeight: "16px" }}>
                 <div className="whitespace-nowrap">Dear{" "}
                   <span className="relative inline-block overflow-hidden align-bottom" style={{ height: "16px", width: "9rem" }}>
                     <span
