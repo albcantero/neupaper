@@ -35,7 +35,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing html field" }, { status: 400 });
     }
 
-    const baseUrl = new URL(req.url).origin;
+    const baseUrl = process.env.NODE_ENV === "development"
+      ? new URL(req.url).origin
+      : "http://localhost:3000";
 
     const browser = await getBrowser();
     const page = await browser.newPage();
