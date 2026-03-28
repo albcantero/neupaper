@@ -105,7 +105,7 @@ export function Features() {
     <section className="max-w-5xl mx-auto px-8 bg-card">
       <div className="flex flex-col md:flex-row">
         <div className="flex-1 flex flex-col gap-4 pt-10 md:pr-12">
-          <Badge variant="outline" className="w-fit gap-1.5 font-normal">
+          <Badge variant="outline" className="w-fit gap-1.5 font-normal text-accent">
             <IconFileText className="size-3" />
             Beautiful output from Markdown
           </Badge>
