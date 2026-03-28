@@ -18,7 +18,7 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
-import { IconZoomIn, IconZoomOut, IconDownload } from "@tabler/icons-react";
+import { IconZoomIn, IconZoomOut, IconDownload, IconFile, IconLayoutList } from "@tabler/icons-react";
 import { parse } from "@/lib/parser";
 import { partitionPages, type PageContent } from "@/lib/page-partitioner";
 
@@ -32,14 +32,18 @@ function MermaidBlock({ code }: { code: string }) {
     let cancelled = false;
 
     const offscreen = document.createElement("div");
-    offscreen.style.cssText = "position:absolute;left:-9999px;top:-9999px;visibility:hidden";
+    offscreen.style.cssText = "position:absolute;left:-9999px;top:-9999px;visibility:hidden;width:800px";
     document.body.appendChild(offscreen);
 
     import("mermaid").then(async ({ default: mermaid }) => {
       if (cancelled) { offscreen.remove(); return; }
       const { default: zenuml } = await import("@mermaid-js/mermaid-zenuml");
       await mermaid.registerExternalDiagrams([zenuml]);
-      mermaid.initialize({ startOnLoad: false, theme: "neutral" });
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: "dark",
+        fontFamily: "var(--font-geist-mono), monospace",
+      });
       const id = "mermaid-" + Math.random().toString(36).slice(2);
 
       const _origStringify = JSON.stringify;
@@ -57,7 +61,8 @@ function MermaidBlock({ code }: { code: string }) {
         ref.current.innerHTML = svg;
         const svgEl = ref.current.querySelector("svg") as SVGSVGElement | null;
         if (svgEl) {
-          if (!svgEl.getAttribute("viewBox")) {
+          const hasViewBox = !!svgEl.getAttribute("viewBox");
+          if (!hasViewBox) {
             const naturalH = parseFloat(svgEl.style.height) || 400;
             svgEl.style.width = "9999px";
             requestAnimationFrame(() => {
@@ -78,10 +83,10 @@ function MermaidBlock({ code }: { code: string }) {
               svgEl.style.height = `${displayH}px`;
             });
           } else {
-            svgEl.style.maxWidth = "100%";
-            if (!svgEl.style.height) {
-              svgEl.style.height = svgEl.getAttribute("height") ?? "auto";
-            }
+            svgEl.removeAttribute("width");
+            svgEl.removeAttribute("height");
+            svgEl.style.width = "100%";
+            svgEl.style.height = "auto";
           }
         }
         bindFunctions?.(ref.current);
@@ -99,7 +104,7 @@ function MermaidBlock({ code }: { code: string }) {
     return () => { cancelled = true; offscreen.remove(); };
   }, [code]);
 
-  return <div ref={ref} style={{ margin: "1rem 0", display: "flex", justifyContent: "center" }} />;
+  return <div ref={ref} style={{ margin: "1rem 0", display: "flex", justifyContent: "center", maxWidth: "100%", overflow: "hidden" }} />;
 }
 
 // ─── Markdown components (shared) ─────────────────────────────────
@@ -118,11 +123,45 @@ const mdComponents = {
 const remarkPlugins = [remarkGfm, remarkBreaks, remarkMath] as Parameters<typeof ReactMarkdown>[0]["remarkPlugins"];
 const rehypePlugins = [rehypeRaw, rehypeKatex] as Parameters<typeof ReactMarkdown>[0]["rehypePlugins"];
 
+// ─── A4 Page ─────────────────────────────────────────────────────
+
+function A4Page({ scale, origin, html }: { scale: number; origin: string; html: string }) {
+  return (
+    <div
+      className="w-[210mm] h-[297mm] bg-[#0a0a0a] border border-border shadow-[0_4px_48px_rgba(0,0,0,0.8)] shrink-0 break-words"
+      style={{ transform: `scale(${scale})`, transformOrigin: origin }}
+    >
+      <div className="px-[20mm] py-[20mm] h-full overflow-hidden">
+        <div className="neu-document" dangerouslySetInnerHTML={{ __html: html }} />
+      </div>
+    </div>
+  );
+}
+
 // ─── Preview ──────────────────────────────────────────────────────
 
-const ZOOM_STEPS  = [0.17, 0.335, 0.5, 0.67, 0.84, 1.0, 1.34];
-const ZOOM_LABELS = [25,   50,    75,  100,  125,  150, 200];
-const DEFAULT_ZOOM_INDEX = 3;
+const ZOOM_MIN = 25;
+const ZOOM_MAX = 200;
+const ZOOM_DEFAULT = 100;
+const ZOOM_STEPS = [25, 50, 75, 100, 125, 150, 200];
+
+function clampZoom(v: number): number {
+  return Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Math.round(v)));
+}
+
+function nextStep(current: number): number {
+  for (const s of ZOOM_STEPS) {
+    if (s > current) return s;
+  }
+  return current;
+}
+
+function prevStep(current: number): number {
+  for (let i = ZOOM_STEPS.length - 1; i >= 0; i--) {
+    if (ZOOM_STEPS[i] < current) return ZOOM_STEPS[i];
+  }
+  return current;
+}
 
 interface PreviewProps {
   content: string;
@@ -134,13 +173,26 @@ export function Preview({ content }: PreviewProps) {
     catch { return content; }
   }, [content]);
 
-  const [zoomIndex, setZoomIndex] = useState(DEFAULT_ZOOM_INDEX);
+  const [zoomPct, setZoomPct] = useState(ZOOM_DEFAULT);
   const [exporting, setExporting] = useState(false);
-  const scale = ZOOM_STEPS[zoomIndex];
+  const [viewMode, setViewMode] = useState<"single" | "scroll">("single");
+  const scale = zoomPct / 150; // 100% display = scale 0.667 (fits A4 in most viewports)
 
-  const zoomIn    = () => setZoomIndex((i) => Math.min(i + 1, ZOOM_STEPS.length - 1));
-  const zoomOut   = () => setZoomIndex((i) => Math.max(i - 1, 0));
-  const zoomReset = () => setZoomIndex(DEFAULT_ZOOM_INDEX);
+  const zoomIn    = () => setZoomPct((z) => nextStep(z));
+  const zoomOut   = () => setZoomPct((z) => prevStep(z));
+  const zoomReset = () => setZoomPct(ZOOM_DEFAULT);
+
+  // ── Ctrl+Wheel zoom (entire vault page) ────────────────────────
+  const canvasRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handler = (e: WheelEvent) => {
+      if (!e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+      setZoomPct((z) => clampZoom(z + (e.deltaY < 0 ? 5 : -5)));
+    };
+    document.addEventListener("wheel", handler, { passive: false });
+    return () => document.removeEventListener("wheel", handler);
+  }, []);
 
   // ── Page partitioning ───────────────────────────────────────────
   const measureRef = useRef<HTMLElement>(null);
@@ -290,23 +342,32 @@ export function Preview({ content }: PreviewProps) {
 
       {/* Toolbar */}
       <div className="flex items-center gap-1 px-3 py-1.5 border-b bg-card">
-        <Button variant="ghost" size="icon-xs" onClick={zoomOut} disabled={zoomIndex === 0}>
+        <Button variant="ghost" size="icon-xs" onClick={zoomOut} disabled={zoomPct <= ZOOM_MIN}>
           <IconZoomOut className="h-3.5 w-3.5" />
         </Button>
-        <button
-          onClick={zoomReset}
-          className="text-xs text-muted-foreground tabular-nums w-12 text-center hover:text-foreground transition-colors"
-        >
-          {ZOOM_LABELS[zoomIndex]}%
-        </button>
-        <Button variant="ghost" size="icon-xs" onClick={zoomIn} disabled={zoomIndex === ZOOM_STEPS.length - 1}>
+        <div className="relative flex items-center">
+          <input
+            type="number"
+            min={ZOOM_MIN}
+            max={ZOOM_MAX}
+            value={zoomPct}
+            onChange={(e) => {
+              const v = parseInt(e.target.value, 10);
+              if (!isNaN(v)) setZoomPct(clampZoom(v));
+            }}
+            onDoubleClick={zoomReset}
+            className="text-xs text-muted-foreground tabular-nums w-10 text-right bg-transparent border-none outline-none focus:text-foreground [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [caret-color:currentColor]"
+          />
+          <span className="text-xs text-muted-foreground">%</span>
+        </div>
+        <Button variant="ghost" size="icon-xs" onClick={zoomIn} disabled={zoomPct >= ZOOM_MAX}>
           <IconZoomIn className="h-3.5 w-3.5" />
         </Button>
 
         <div className="flex-1" />
 
-        {/* Pagination */}
-        {totalPages > 1 && (
+        {/* Pagination (single mode only) */}
+        {viewMode === "single" && totalPages > 1 && (
           <Pagination className="w-auto mx-0">
             <PaginationContent className="gap-0.5">
               <PaginationItem>
@@ -328,41 +389,56 @@ export function Preview({ content }: PreviewProps) {
 
         <div className="flex-1" />
 
+        <Button
+          variant="ghost"
+          size="icon-xs"
+          onClick={() => setViewMode((m) => m === "single" ? "scroll" : "single")}
+          title={viewMode === "single" ? "Scroll view" : "Single page"}
+        >
+          {viewMode === "single" ? <IconLayoutList className="h-3.5 w-3.5" /> : <IconFile className="h-3.5 w-3.5" />}
+        </Button>
         <Button variant="ghost" size="icon-xs" onClick={exportPdf} disabled={exporting} title="Export PDF">
           <IconDownload className="h-3.5 w-3.5" />
         </Button>
       </div>
 
       {/* Canvas */}
-      <div className="flex-1 overflow-auto flex justify-center bg-[#111] bg-[radial-gradient(#333_1px,transparent_1px)] bg-[length:24px_24px] [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar]:h-3 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:border-[4px] [&::-webkit-scrollbar-thumb]:border-transparent [&::-webkit-scrollbar-thumb]:[background-clip:padding-box]">
-        {/* Wrapper sized to the scaled A4 + padding, so scroll matches visual size */}
-        <div
-          className="shrink-0"
-          style={{
-            width: `calc(210mm * ${scale} + 96px)`,
-            height: `calc(297mm * ${scale} + 96px)`,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+      <div ref={canvasRef} className="flex-1 overflow-auto flex justify-center bg-background bg-[radial-gradient(var(--border)_1px,transparent_1px)] bg-[length:24px_24px] [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar]:h-3 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:border-[4px] [&::-webkit-scrollbar-thumb]:border-transparent [&::-webkit-scrollbar-thumb]:[background-clip:padding-box]">
+        {viewMode === "single" ? (
           <div
-            className="w-[210mm] h-[297mm] bg-white shadow-[0_4px_32px_rgba(0,0,0,0.4)] shrink-0 break-words"
+            className="shrink-0"
             style={{
-              transform: `scale(${scale})`,
-              transformOrigin: "center center",
+              width: `calc(210mm * ${scale} + 96px)`,
+              height: `calc(297mm * ${scale} + 96px)`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <div className="px-[20mm] py-[20mm] h-full overflow-hidden">
-              <div
-                className="neu-document"
-                dangerouslySetInnerHTML={{
-                  __html: pages[currentPage]?.fragments.join("") ?? "",
-                }}
-              />
-            </div>
+            <A4Page scale={scale} origin="center center" html={pages[currentPage]?.fragments.join("") ?? ""} />
           </div>
-        </div>
+        ) : (
+          <div
+            className="shrink-0 flex flex-col items-center"
+            style={{
+              width: `calc(210mm * ${scale} + 96px)`,
+              padding: "24px 0",
+              gap: "12px",
+            }}
+          >
+            {pages.map((page, i) => (
+              <div
+                key={i}
+                style={{
+                  width: `calc(210mm * ${scale})`,
+                  height: `calc(297mm * ${scale})`,
+                }}
+              >
+                <A4Page scale={scale} origin="top left" html={page.fragments.join("")} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

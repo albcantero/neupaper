@@ -12,12 +12,16 @@ export default function PrintPage() {
         html, body {
           height: auto !important;
           overflow: visible !important;
-          background: white !important;
+          background: #0a0a0a !important;
+          margin: 0 !important;
+          padding: 0 !important;
           display: block !important;
-          color-scheme: light !important;
         }
-        /* Hide the dashed visual indicator — Puppeteer's PDF engine
-           handles the actual page break via break-before: page */
+        article.neu-document {
+          padding: 20mm !important;
+          -webkit-box-decoration-break: clone;
+          box-decoration-break: clone;
+        }
         .neu-pagebreak {
           border: none !important;
           margin: 0 !important;

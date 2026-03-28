@@ -1,90 +1,119 @@
+/* ── Neupaper document theme — dark minimal (Vercel/Linear) ── */
+/* Colors from Shadcn dark palette (neutral hue 0°) */
+
 .neu-document {
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
   font-size: 11pt;
-  line-height: 1.7;
-  color: #1a1a1a;
+  line-height: 1.75;
+  color: oklch(0.708 0 0);                              /* muted-foreground */
+  background: #0a0a0a;
+  -webkit-font-smoothing: antialiased;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .neu-document h1 {
-  font-size: 24pt;
-  font-weight: 700;
-  margin: 0 0 0.6em;
-  line-height: 1.2;
-  color: #111;
+  font-size: 26pt;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: oklch(0.985 0 0);                              /* foreground */
+  margin: 0 0 0.5em;
 }
 
 .neu-document h2 {
   font-size: 18pt;
   font-weight: 600;
-  margin: 1.4em 0 0.5em;
-  line-height: 1.3;
-  color: #111;
+  letter-spacing: -0.02em;
+  color: oklch(0.985 0 0);                              /* foreground */
+  margin: 1.6em 0 0.5em;
+  line-height: 1.2;
 }
 
 .neu-document h3 {
-  font-size: 14pt;
+  font-size: 15pt;
   font-weight: 600;
-  margin: 1.2em 0 0.4em;
-  line-height: 1.4;
-  color: #222;
+  letter-spacing: -0.01em;
+  color: oklch(0.985 0 0);                              /* foreground */
+  margin: 1.4em 0 0.4em;
+  line-height: 1.3;
 }
 
 .neu-document h4 {
-  font-size: 12pt;
-  font-weight: 600;
-  margin: 1em 0 0.3em;
-  color: #333;
+  font-size: 13pt;
+  font-weight: 500;
+  color: oklch(0.985 0 0);                              /* foreground */
+  margin: 1.2em 0 0.3em;
+  line-height: 1.3;
 }
 
 .neu-document p {
-  margin: 0 0 0.8em;
+  margin: 0 0 0.9em;
 }
 
 .neu-document strong {
-  font-weight: 600;
+  font-weight: 500;
+  color: oklch(0.985 0 0);                              /* foreground */
+}
+
+.neu-document em {
+  color: oklch(0.985 0 0);                              /* foreground */
 }
 
 .neu-document a {
-  color: #2563eb;
+  color: oklch(0.488 0.243 264.376);                    /* chart-1 (blue) */
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-underline-offset: 3px;
+  text-decoration-color: oklch(0.488 0.243 264.376 / 0.3);
 }
 
-.neu-document ul,
+.neu-document ul {
+  margin: 0 0 0.9em;
+  padding-left: 2.5em;
+  list-style-type: disc;
+}
+
 .neu-document ol {
-  margin: 0 0 0.8em;
-  padding-left: 1.5em;
+  margin: 0 0 0.9em;
+  padding-left: 2.5em;
+  list-style-type: decimal;
 }
 
 .neu-document li {
-  margin: 0.2em 0;
+  margin: 0.25em 0;
+}
+
+.neu-document ol li::marker {
+  font-family: var(--font-geist-mono), monospace;
 }
 
 .neu-document li > ul,
 .neu-document li > ol {
-  margin: 0.2em 0 0;
+  margin: 0.25em 0 0;
 }
 
 .neu-document blockquote {
-  margin: 0 0 0.8em;
+  margin: 0 0 0.9em;
   padding: 0.4em 0 0.4em 1em;
-  border-left: 3px solid #d1d5db;
-  color: #555;
+  border-left: 2px solid oklch(1 0 0 / 10%);            /* border */
+  color: oklch(0.708 0 0);                              /* muted-foreground */
 }
 
 .neu-document code {
-  font-family: var(--font-mono), monospace;
-  font-size: 0.9em;
-  background: #f3f4f6;
-  padding: 0.15em 0.35em;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.88em;
+  background: #171717;
+  color: oklch(0.985 0 0);                              /* foreground */
+  padding: 0.15em 0.4em;
   border-radius: 4px;
+  border: 1px solid oklch(1 0 0 / 10%);                 /* border */
 }
 
 .neu-document pre {
-  margin: 0 0 0.8em;
-  padding: 0.8em 1em;
-  background: #f8f9fa;
-  border: 1px solid #e5e7eb;
+  margin: 0 0 0.9em;
+  padding: 0.9em 1.1em;
+  background: #171717;
+  border: 1px solid oklch(1 0 0 / 10%);                 /* border */
   border-radius: 6px;
   overflow-x: auto;
 }
@@ -92,36 +121,80 @@
 .neu-document pre code {
   background: none;
   padding: 0;
+  border: none;
   border-radius: 0;
+  font-size: 0.9em;
 }
 
 .neu-document hr {
-  margin: 1.5em 0;
+  margin: 1.8em 0;
   border: none;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid oklch(1 0 0 / 10%);              /* border */
 }
 
 .neu-document table {
   width: 100%;
-  margin: 0 0 0.8em;
+  margin: 0 0 0.9em;
   border-collapse: collapse;
   font-size: 10pt;
 }
 
 .neu-document th {
-  font-weight: 600;
+  font-weight: 500;
+  font-size: 8pt;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   text-align: left;
-  padding: 0.5em 0.75em;
-  border-bottom: 2px solid #d1d5db;
+  padding: 0.6em 0.8em;
+  color: oklch(0.708 0 0);                              /* muted-foreground */
+  border-bottom: 1px solid oklch(1 0 0 / 10%);          /* border */
 }
 
 .neu-document td {
-  padding: 0.4em 0.75em;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 0.5em 0.8em;
+  border-bottom: 1px solid oklch(1 0 0 / 10%);          /* border */
+  color: oklch(0.708 0 0);                              /* muted-foreground */
+}
+
+.neu-document td strong {
+  color: oklch(0.985 0 0);                              /* foreground */
 }
 
 .neu-document tr:last-child td {
   border-bottom: none;
+}
+
+.neu-document h5 {
+  font-size: 12pt;
+  font-weight: 500;
+  line-height: 1.3;
+  color: oklch(0.985 0 0);                              /* foreground */
+  margin: 1em 0 0.3em;
+}
+
+.neu-document h6 {
+  font-size: 11pt;
+  font-weight: 500;
+  line-height: 1.3;
+  color: oklch(0.708 0 0);                              /* muted-foreground */
+  margin: 1em 0 0.3em;
+}
+
+.neu-document del {
+  text-decoration: line-through;
+  color: oklch(0.556 0 0);                              /* ring / dimmed */
+}
+
+.neu-document mark {
+  background: oklch(0.488 0.243 264.376 / 0.2);         /* chart-1 at 20% */
+  color: oklch(0.985 0 0);                              /* foreground */
+  padding: 0.1em 0.2em;
+  border-radius: 2px;
+}
+
+.neu-document li:has(> input[type="checkbox"]) {
+  list-style-type: none;
+  margin-left: -1.5em;
 }
 
 .neu-document img {
@@ -138,13 +211,18 @@
   break-before: page;
   display: block;
   height: 0;
-  border-top: 1.5px dashed #94a3b8;
+  border-top: 1px dashed oklch(1 0 0 / 10%);            /* border */
   margin: 1.5em 0;
 }
 
 /* ── Mermaid Gantt — rotate dense x-axis date labels ── */
 .neu-document svg[aria-roledescription="gantt"] .tick text {
-  transform: rotate(-45deg) translate(-8px, 4px);
+  transform: rotate(-45deg) translate(-40px, 0px);
   text-anchor: end;
   font-size: 10px;
+}
+
+/* ── KaTeX dark ── */
+.neu-document .katex {
+  color: oklch(0.985 0 0);                              /* foreground */
 }

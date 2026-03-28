@@ -24,12 +24,27 @@ function measurePageHeightPx(): number {
   return px;
 }
 
-/** Total vertical space an element occupies, including margins. */
-function elementHeight(el: HTMLElement, isFirstOnPage: boolean): number {
+/** Total vertical space an element occupies, including margins.
+ *  `prevMarginBottom` is the bottom margin of the previous element
+ *  — used to simulate CSS margin collapse between adjacent siblings. */
+function elementHeight(
+  el: HTMLElement,
+  isFirstOnPage: boolean,
+  prevMarginBottom: number = 0,
+): number {
   const style = getComputedStyle(el);
   const marginTop = isFirstOnPage ? 0 : parseFloat(style.marginTop) || 0;
   const marginBottom = parseFloat(style.marginBottom) || 0;
-  return marginTop + el.offsetHeight + marginBottom;
+  // CSS collapses adjacent margins: the effective gap is max(prev bottom, this top)
+  const collapsedTop = isFirstOnPage
+    ? 0
+    : Math.max(marginTop, prevMarginBottom) - prevMarginBottom;
+  return collapsedTop + el.offsetHeight + marginBottom;
+}
+
+/** Return the bottom margin of an element (for collapse tracking). */
+function bottomMargin(el: HTMLElement): number {
+  return parseFloat(getComputedStyle(el).marginBottom) || 0;
 }
 
 /** Margin overhead of a <p> element (top + bottom), for adjusting split budget. */
@@ -148,10 +163,12 @@ export function partitionPages(article: HTMLElement): PageContent[] {
   let remaining = PAGE_H;
 
   const currentPage = () => pages[pages.length - 1];
+  let prevMB = 0; // bottom margin of previous element (for collapse)
 
   const startNewPage = () => {
     pages.push({ fragments: [] });
     remaining = PAGE_H;
+    prevMB = 0;
   };
 
   const children = article.children;
@@ -166,31 +183,76 @@ export function partitionPages(article: HTMLElement): PageContent[] {
     }
 
     const isFirst = currentPage().fragments.length === 0;
-    const h = elementHeight(el, isFirst);
+    const h = elementHeight(el, isFirst, prevMB);
 
     // ── Element fits on current page
     if (h <= remaining) {
-      // Sticky headings: if this is a heading and it's the last thing that
-      // fits (nothing after it fits, or there IS no next content element),
-      // move it to the next page to avoid orphaned headings.
-      if (/^H[1-6]$/.test(el.tagName)) {
-        const next = children[i + 1] as HTMLElement | undefined;
-        const hasNextContent = next && !next.classList.contains("neu-pagebreak");
-        if (hasNextContent) {
-          const nextH = elementHeight(next, false);
-          if (nextH > remaining - h) {
-            // Next element won't fit after this heading → move heading to next page
-            startNewPage();
-            currentPage().fragments.push(toHtml(el));
-            remaining -= elementHeight(el, true);
-            continue;
-          }
-        }
-      }
-
       currentPage().fragments.push(toHtml(el));
       remaining -= h;
+      prevMB = bottomMargin(el);
       continue;
+    }
+
+    // ── Element doesn't fit — try to split lists by <li>
+    if (el.tagName === "OL" || el.tagName === "UL") {
+      const listItems = el.children;
+      if (listItems.length > 0) {
+        // Build first half: items that fit on current page
+        const firstList = document.createElement(el.tagName);
+        copyAttrs(el, firstList);
+        let usedHeight = 0;
+        let splitIndex = 0;
+
+        // Account for list margin-top on current page
+        const listStyle = getComputedStyle(el);
+        const listMarginTop = isFirst ? 0 : parseFloat(listStyle.marginTop) || 0;
+        usedHeight += listMarginTop;
+
+        for (let j = 0; j < listItems.length; j++) {
+          const li = listItems[j] as HTMLElement;
+          const liH = elementHeight(li, j === 0);
+          if (usedHeight + liH > remaining) break;
+          usedHeight += liH;
+          splitIndex = j + 1;
+        }
+
+        if (splitIndex > 0 && splitIndex < listItems.length) {
+          // Some items fit — split the list
+          for (let j = 0; j < splitIndex; j++) {
+            firstList.appendChild(listItems[j].cloneNode(true));
+          }
+          currentPage().fragments.push(firstList.outerHTML);
+
+          // Remaining items go to next page
+          const secondList = document.createElement(el.tagName);
+          copyAttrs(el, secondList);
+          // For <ol>, continue numbering from where we left off
+          if (el.tagName === "OL") {
+            const startAttr = el.getAttribute("start");
+            const startNum = startAttr ? parseInt(startAttr, 10) : 1;
+            secondList.setAttribute("start", String(startNum + splitIndex));
+          }
+          for (let j = splitIndex; j < listItems.length; j++) {
+            secondList.appendChild(listItems[j].cloneNode(true));
+          }
+
+          startNewPage();
+          // Measure second list
+          const tmp = document.createElement("div");
+          tmp.style.cssText = "position:absolute;left:-9999px;width:170mm;visibility:hidden";
+          tmp.appendChild(secondList.cloneNode(true));
+          document.body.appendChild(tmp);
+          const secondH = elementHeight(tmp.firstElementChild as HTMLElement, true);
+          tmp.remove();
+
+          currentPage().fragments.push(secondList.outerHTML);
+          remaining -= secondH;
+          prevMB = bottomMargin(el);
+          continue;
+        }
+        // splitIndex === 0: not even one item fits → fall through to move whole
+        // splitIndex === listItems.length: all fit (shouldn't reach here) → fall through
+      }
     }
 
     // ── Element doesn't fit — try to split if it's a <p>
@@ -222,6 +284,7 @@ export function partitionPages(article: HTMLElement): PageContent[] {
 
         currentPage().fragments.push(split.second);
         remaining -= secondH;
+        prevMB = secondChild ? bottomMargin(secondChild) : 0;
         continue;
       }
       // split returned null → can't fit even one line, fall through to "move whole"
@@ -232,6 +295,7 @@ export function partitionPages(article: HTMLElement): PageContent[] {
     currentPage().fragments.push(toHtml(el));
     const newH = elementHeight(el, true);
     remaining -= newH;
+    prevMB = bottomMargin(el);
 
     // If element is taller than a full page, remaining goes negative.
     // That's fine — next element will start yet another new page.
