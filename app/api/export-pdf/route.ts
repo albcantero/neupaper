@@ -19,10 +19,11 @@ async function getBrowser() {
     });
   }
 
+  const chromium = (await import("@sparticuz/chromium")).default;
   return puppeteer.launch({
-    executablePath: process.env.CHROME_PATH || "/usr/bin/chromium-browser",
+    args: [...chromium.args, ...CHROME_ARGS],
+    executablePath: await chromium.executablePath(),
     headless: true,
-    args: CHROME_ARGS,
   });
 }
 
