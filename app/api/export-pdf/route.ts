@@ -3,21 +3,26 @@ import puppeteer from "puppeteer-core";
 
 const isDev = process.env.NODE_ENV === "development";
 
+const CHROME_ARGS = [
+  "--no-sandbox",
+  "--disable-setuid-sandbox",
+  "--disable-dev-shm-usage",
+  "--disable-gpu",
+];
+
 async function getBrowser() {
   if (isDev) {
     return puppeteer.launch({
       executablePath: process.env.CHROME_PATH || "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
       headless: true,
-      args: ["--no-sandbox"],
+      args: CHROME_ARGS,
     });
   }
 
-  const chromium = (await import("@sparticuz/chromium")).default;
   return puppeteer.launch({
-    args: chromium.args,
-    defaultViewport: { width: 1920, height: 1080 },
-    executablePath: await chromium.executablePath(),
+    executablePath: process.env.CHROME_PATH || "/usr/bin/chromium-browser",
     headless: true,
+    args: CHROME_ARGS,
   });
 }
 
