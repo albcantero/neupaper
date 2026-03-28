@@ -274,10 +274,12 @@ export default function VaultPage() {
             </ResizablePanel>
           </ResizablePanelGroup>
         ) : (
-          <div className="flex-1 flex items-center justify-center bg-muted/30 h-full">
-            <p className="text-muted-foreground">
-              Selecciona un archivo o crea uno nuevo
-            </p>
+          <div className="flex-1 flex items-center justify-center bg-background h-full p-8">
+            <Card className="flex items-center justify-center w-full h-full">
+              <p className="text-muted-foreground">
+                Selecciona un archivo o crea uno nuevo
+              </p>
+            </Card>
           </div>
         )}
       </SidebarInset>

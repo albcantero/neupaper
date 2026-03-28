@@ -128,7 +128,7 @@ const rehypePlugins = [rehypeRaw, rehypeKatex] as Parameters<typeof ReactMarkdow
 function A4Page({ scale, origin, html }: { scale: number; origin: string; html: string }) {
   return (
     <div
-      className="w-[210mm] h-[297mm] bg-[#0a0a0a] border border-border shadow-[0_4px_48px_rgba(0,0,0,0.8)] shrink-0 break-words"
+      className="w-[210mm] h-[297mm] bg-[#0a0a0a] border border-border shrink-0 break-words"
       style={{ transform: `scale(${scale})`, transformOrigin: origin }}
     >
       <div className="px-[20mm] py-[20mm] h-full overflow-hidden">
@@ -403,7 +403,7 @@ export function Preview({ content }: PreviewProps) {
       </div>
 
       {/* Canvas */}
-      <div ref={canvasRef} className="flex-1 overflow-auto flex justify-center bg-background bg-[radial-gradient(var(--border)_1px,transparent_1px)] bg-[length:24px_24px] [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar]:h-3 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:border-[4px] [&::-webkit-scrollbar-thumb]:border-transparent [&::-webkit-scrollbar-thumb]:[background-clip:padding-box]">
+      <div ref={canvasRef} className="flex-1 overflow-auto flex justify-center bg-card bg-[radial-gradient(var(--border)_1px,transparent_1px)] bg-[length:24px_24px] [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar]:h-3 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:border-[4px] [&::-webkit-scrollbar-thumb]:border-transparent [&::-webkit-scrollbar-thumb]:[background-clip:padding-box]">
         {viewMode === "single" ? (
           <div
             className="shrink-0"

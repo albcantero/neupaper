@@ -162,7 +162,7 @@ export function EditorTabs({ openFiles, activeId, activeFile, onSelect, onClose,
                   <TabsTrigger
                     key={file.id}
                     value={file.id}
-                    className="group h-7 border border-transparent pt-0.5 shadow-none! hover:bg-muted data-[state=active]:border-input data-[state=active]:bg-background! gap-1.5 [&_svg]:size-auto pl-2"
+                    className="group h-7 border border-transparent pt-0.5 shadow-none! dark:hover:bg-accent/50 data-[state=active]:border-input data-[state=active]:dark:bg-input/30! data-[state=active]:dark:hover:bg-input/50! gap-1.5 [&_svg]:size-auto pl-2"
                   >
                     {fileIcon(file.name, "sm")}
                     <span className="truncate max-w-32 text-xs">{file.name}</span>
