@@ -1,5 +1,6 @@
-import type { ASTNode, IfBranch } from "./ast";
+import type { ASTNode, IfBranch, Condition } from "./ast";
 import { parseData } from "./data-parser";
+import { splitPath } from "./utils";
 
 // ─── Data context ─────────────────────────────────────────────────
 //
@@ -22,7 +23,7 @@ function resolve(
   ctx: DataObject,
   locals: DataObject,
 ): DataValue | undefined {
-  const parts = path.replace(/^@/, "").split(".");
+  const parts = splitPath(path);
 
   // Start from locals if the root key is there, otherwise from ctx
   let current: DataValue | undefined =
@@ -51,15 +52,23 @@ function stringify(v: DataValue | undefined): string {
 
 // ─── Evaluate a branch condition ──────────────────────────────────
 
+function testSingle(c: Condition, ctx: DataObject, locals: DataObject): boolean {
+  const val = stringify(resolve(c.path, ctx, locals));
+  const match = val === c.value;
+  return c.operator === "is" ? match : !match;
+}
+
 function testCondition(
   branch: IfBranch,
   ctx: DataObject,
   locals: DataObject,
 ): boolean {
   if (!branch.condition) return true; // else branch
-  const val = stringify(resolve(branch.condition.path, ctx, locals));
-  const match = val === branch.condition.value;
-  return branch.condition.operator === "is" ? match : !match;
+  if (Array.isArray(branch.condition)) {
+    // OR: any condition matches → true
+    return branch.condition.some((c) => testSingle(c, ctx, locals));
+  }
+  return testSingle(branch.condition, ctx, locals);
 }
 
 // ─── Resolve list variable to array ──────────────────────────────
@@ -86,6 +95,7 @@ export function evaluate(
   nodes: ASTNode[],
   ctx: DataObject,
   locals: DataObject = {},
+  dataFiles: Record<string, string> = {},
 ): string {
   let out = "";
 
@@ -108,9 +118,19 @@ export function evaluate(
         // Consumed by the preview layer (font, theme), not emitted
         break;
 
-      case "load":
-        // File loading is handled at a higher level; no output
+      case "import":
+        // Declarative — component resolution handles this
         break;
+
+      case "load": {
+        // Load external .data file and merge into ctx
+        const fileContent = dataFiles[node.file];
+        if (fileContent) {
+          const parsed = parseData(fileContent);
+          Object.assign(ctx, parsed);
+        }
+        break;
+      }
 
       // ── Inline data block ─────────────────────────────────────
       case "data": {
@@ -129,8 +149,8 @@ export function evaluate(
 
       // ── Set ───────────────────────────────────────────────────
       case "set": {
-        const key = node.path.replace(/^@/, "");
-        const parts = key.split(".");
+        const parts = splitPath(node.path);
+        const key = parts.join(".");
         if (parts.length === 1) {
           ctx[key] = node.value;
         } else {
@@ -168,7 +188,7 @@ export function evaluate(
 
           // Strip the single leading newline that comes from the line break
           // after ${ for ... } so rows aren't separated by blank lines
-          const result = evaluate(node.children, ctx, itemLocals);
+          const result = evaluate(node.children, ctx, itemLocals, dataFiles);
           parts.push(result.startsWith("\n") ? result.slice(1) : result);
         }
 
@@ -180,12 +200,27 @@ export function evaluate(
       case "if": {
         for (const branch of node.branches) {
           if (testCondition(branch, ctx, locals)) {
-            const result = evaluate(branch.children, ctx, locals);
-            // Strip the leading "then " prefix (block form syntax)
-            out += result.replace(/^[ \t\n\r]*then /, "");
+            const result = evaluate(branch.children, ctx, locals, dataFiles);
+            out += result;
             break;
           }
         }
+        break;
+      }
+
+      // ── Document ─────────────────────────────────────────────
+      case "document": {
+        out += evaluate(node.children, ctx, locals, dataFiles);
+        break;
+      }
+
+      // ── Component with children (open/close) ─────────────────
+      case "component": {
+        const childrenHtml = evaluate(node.children, ctx, locals, dataFiles);
+        // Emit as a component call that resolveComponents will pick up
+        // __children__ is a reserved prop carrying the evaluated body
+        const propsStr = node.props ? ` ${node.props}` : "";
+        out += `<${node.name}${propsStr} __children__="${encodeURIComponent(childrenHtml)}">`;
         break;
       }
     }

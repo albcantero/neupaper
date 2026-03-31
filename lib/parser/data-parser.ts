@@ -19,6 +19,45 @@ import type { DataObject, DataValue } from "./evaluator";
  *
  * Access is 1-indexed: @key.1.p1
  */
+/**
+ * Splits a comma-separated line respecting quoted strings.
+ * Unquoted values take only the first word.
+ * "Smith, Jr.", 500  →  ["Smith, Jr.", "500"]
+ * Alberto, free      →  ["Alberto", "free"]
+ * hello world, 5     →  ["hello", "5"]  (unquoted: first word only)
+ */
+function smartSplit(line: string): string[] {
+  const values: string[] = [];
+  let i = 0;
+
+  while (i < line.length) {
+    // Skip whitespace
+    while (i < line.length && line[i] === " ") i++;
+    if (i >= line.length) break;
+
+    if (line[i] === '"') {
+      // Quoted value — read until closing quote
+      i++; // skip opening "
+      const start = i;
+      while (i < line.length && line[i] !== '"') i++;
+      values.push(line.slice(start, i));
+      i++; // skip closing "
+      // Skip to next comma
+      while (i < line.length && line[i] !== ",") i++;
+      i++; // skip comma
+    } else {
+      // Unquoted — read until comma, take first word only
+      const start = i;
+      while (i < line.length && line[i] !== ",") i++;
+      const raw = line.slice(start, i).trim();
+      values.push(raw);
+      i++; // skip comma
+    }
+  }
+
+  return values;
+}
+
 export function parseData(raw: string): DataObject {
   const result: DataObject = {};
   const lines = raw.split("\n").map((l) => l.trim()).filter(Boolean);
@@ -40,7 +79,7 @@ export function parseData(raw: string): DataObject {
         const itemLine = lines[i];
         if (props) {
           // Object item: zip values with prop names
-          const values = itemLine.split(",").map((v) => v.trim());
+          const values = smartSplit(itemLine);
           const obj: DataObject = {};
           for (let p = 0; p < props.length; p++) {
             obj[props[p]] = values[p] ?? "";

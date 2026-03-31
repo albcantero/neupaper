@@ -1,7 +1,7 @@
 // ─── Page Partitioner ─────────────────────────────────────────────
 //
 // Walks a fully-rendered <article> DOM and splits its children into
-// pages that fit within 257mm (A4 content height).  Paragraphs that
+// pages that fit within 247mm (A4 content height).  Paragraphs that
 // straddle a page boundary are split using the Range API.
 
 // ─── Types ────────────────────────────────────────────────────────
@@ -13,11 +13,11 @@ export interface PageContent {
 
 // ─── Helpers ──────────────────────────────────────────────────────
 
-/** Convert 257mm to pixels in the current rendering context. */
+/** Convert 247mm to pixels in the current rendering context. */
 function measurePageHeightPx(): number {
   const ruler = document.createElement("div");
   ruler.style.cssText =
-    "position:absolute;width:0;height:257mm;visibility:hidden;pointer-events:none";
+    "position:absolute;width:0;height:247mm;visibility:hidden;pointer-events:none";
   document.body.appendChild(ruler);
   const px = ruler.offsetHeight;
   ruler.remove();
@@ -239,7 +239,7 @@ export function partitionPages(article: HTMLElement): PageContent[] {
           startNewPage();
           // Measure second list
           const tmp = document.createElement("div");
-          tmp.style.cssText = "position:absolute;left:-9999px;width:170mm;visibility:hidden";
+          tmp.style.cssText = "position:absolute;left:-9999px;width:210mm;visibility:hidden";
           tmp.appendChild(secondList.cloneNode(true));
           document.body.appendChild(tmp);
           const secondH = elementHeight(tmp.firstElementChild as HTMLElement, true);
@@ -273,7 +273,7 @@ export function partitionPages(article: HTMLElement): PageContent[] {
         // We create a temporary element to measure it
         const tmp = document.createElement("div");
         tmp.style.cssText =
-          "position:absolute;left:-9999px;width:170mm;visibility:hidden";
+          "position:absolute;left:-9999px;width:210mm;visibility:hidden";
         tmp.innerHTML = split.second;
         document.body.appendChild(tmp);
         const secondChild = tmp.firstElementChild as HTMLElement | null;

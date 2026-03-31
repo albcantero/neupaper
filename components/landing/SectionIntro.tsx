@@ -2,7 +2,7 @@ export function SectionIntro() {
   return (
     <section className="max-w-5xl mx-auto px-4 pt-16 pb-5">
       <div className="flex flex-col gap-1">
-        <p className="font-medium text-[15px] tracking-tight uppercase font-mono-display text-accent">
+        <p className="font-medium text-[15px] tracking-tight uppercase font-mono-display text-accent-display">
           // Features
         </p>
         <h2 className="text-5xl font-medium tracking-tight max-w-3xl leading-tight">

@@ -48,4 +48,16 @@ describe("tokenizer", () => {
   it("fuente vacía devuelve array vacío", () => {
     expect(tokenize("")).toEqual([]);
   });
+
+  it("isla al inicio del source", () => {
+    const tokens = tokenize("${ @x } texto");
+    expect(tokens[0]).toEqual({ type: "isle", body: "@x" });
+    expect(tokens[1]).toEqual({ type: "text", value: " texto" });
+  });
+
+  it("isla al final del source", () => {
+    const tokens = tokenize("texto ${ @x }");
+    expect(tokens[0]).toEqual({ type: "text", value: "texto " });
+    expect(tokens[1]).toEqual({ type: "isle", body: "@x" });
+  });
 });

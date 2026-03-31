@@ -128,10 +128,10 @@ const rehypePlugins = [rehypeRaw, rehypeKatex] as Parameters<typeof ReactMarkdow
 function A4Page({ scale, origin, html }: { scale: number; origin: string; html: string }) {
   return (
     <div
-      className="w-[210mm] h-[297mm] bg-[#0a0a0a] border border-border shrink-0 break-words"
+      className="relative w-[210mm] h-[297mm] bg-[#0a0a0a] border border-white/[0.08] shrink-0 break-words shadow-[inset_0_0_1px_1.5px_hsla(0,0%,100%,0.15)]"
       style={{ transform: `scale(${scale})`, transformOrigin: origin }}
     >
-      <div className="px-[20mm] py-[20mm] h-full overflow-hidden">
+      <div className="h-full overflow-hidden [&>.neu-document]:h-full">
         <div className="neu-document" dangerouslySetInnerHTML={{ __html: html }} />
       </div>
     </div>
@@ -165,13 +165,15 @@ function prevStep(current: number): number {
 
 interface PreviewProps {
   content: string;
+  components?: Record<string, string>;
+  dataFiles?: Record<string, string>;
 }
 
-export function Preview({ content }: PreviewProps) {
+export function Preview({ content, components = {}, dataFiles = {} }: PreviewProps) {
   const markdown = useMemo(() => {
-    try { return parse(content); }
+    try { return parse(content, {}, components, dataFiles); }
     catch { return content; }
-  }, [content]);
+  }, [content, components, dataFiles]);
 
   const [zoomPct, setZoomPct] = useState(ZOOM_DEFAULT);
   const [exporting, setExporting] = useState(false);
@@ -320,13 +322,13 @@ export function Preview({ content }: PreviewProps) {
 
   return (
     <div className="h-full flex flex-col">
-      {/* Hidden measurement container — same width as A4 content area */}
+      {/* Hidden measurement container — same width as A4 page */}
       <div
         style={{
           position: "absolute",
           left: "-9999px",
           top: 0,
-          width: "170mm",
+          width: "210mm",
           visibility: "hidden",
           pointerEvents: "none",
         }}

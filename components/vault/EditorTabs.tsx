@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback, Fragment } from "react";
-import { IconX, IconSettings, IconBan } from "@tabler/icons-react";
+import { IconX, IconSettings, IconBan, IconCircleDashed, IconCircleCheckFilled, IconSparkles2Filled } from "@tabler/icons-react";
+import type { EditorSettings } from "@/lib/hooks/use-editor-settings";
 import { motion, AnimatePresence } from "framer-motion";
 
 function AnimatedCheck({ className }: { className?: string }) {
@@ -86,19 +87,12 @@ interface EditorTabsProps {
   activeFile: NeuFile;
   onSelect: (id: string) => void;
   onClose: (id: string) => void;
-  editorTheme: EditorThemeId;
-  editorFont: EditorFontId;
-  editorFontSize: number;
-  editorLigatures: boolean;
-  editorAltChars: boolean;
-  onEditorThemeChange: (theme: EditorThemeId) => void;
-  onEditorFontChange: (font: EditorFontId) => void;
-  onEditorFontSizeChange: (size: number) => void;
-  onEditorLigaturesChange: (enabled: boolean) => void;
-  onEditorAltCharsChange: (enabled: boolean) => void;
+  settings: EditorSettings;
+  onSettingChange: <K extends keyof EditorSettings>(key: K, value: EditorSettings[K]) => void;
+  onSettingsReset?: () => void;
 }
 
-export function EditorTabs({ openFiles, activeId, activeFile, onSelect, onClose, editorTheme, editorFont, editorFontSize, editorLigatures, editorAltChars, onEditorThemeChange, onEditorFontChange, onEditorFontSizeChange, onEditorLigaturesChange, onEditorAltCharsChange }: EditorTabsProps) {
+export function EditorTabs({ openFiles, activeId, activeFile, onSelect, onClose, settings, onSettingChange, onSettingsReset }: EditorTabsProps) {
   const [vaultName, setVaultName] = useState("My Vault");
   useEffect(() => {
     const saved = localStorage.getItem("neupaper:vault-name");
@@ -189,7 +183,7 @@ export function EditorTabs({ openFiles, activeId, activeFile, onSelect, onClose,
               <IconSettings className="h-4 w-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent align="end" className="w-80 font-[family-name:var(--font-vault)] [&_svg.tabler-icon]:stroke-[1.75]">
+          <PopoverContent align="end" className="w-95 font-[family-name:var(--font-vault)] [&_svg.tabler-icon]:stroke-[1.75]">
             <div className="grid gap-4">
               <div className="space-y-0">
                 <div className="flex items-center justify-between gap-2">
@@ -197,13 +191,7 @@ export function EditorTabs({ openFiles, activeId, activeFile, onSelect, onClose,
                   <Button
                     variant="secondary"
                     className="h-7 rounded-full px-2 py-1 text-xs"
-                    onClick={() => {
-                      onEditorThemeChange(EDITOR_THEMES[0].id);
-                      onEditorFontChange(EDITOR_FONTS[0].id);
-                      onEditorFontSizeChange(14);
-                      onEditorLigaturesChange(true);
-                      onEditorAltCharsChange(false);
-                    }}
+                    onClick={() => onSettingsReset?.()}
                   >
                   Reset all
                   </Button>
@@ -216,10 +204,10 @@ export function EditorTabs({ openFiles, activeId, activeFile, onSelect, onClose,
                   <div className="col-span-2">
                     <Combobox
                       items={themeLabels}
-                      value={EDITOR_THEMES.find((t) => t.id === editorTheme)?.label ?? null}
+                      value={EDITOR_THEMES.find((t) => t.id === settings.theme)?.label ?? null}
                       onValueChange={(val) => {
                         const theme = EDITOR_THEMES.find((t) => t.label === val);
-                        if (theme) onEditorThemeChange(theme.id);
+                        if (theme) onSettingChange("theme", theme.id);
                       }}
                     >
                       <ComboboxInput placeholder="Select theme" showClear />
@@ -246,14 +234,14 @@ export function EditorTabs({ openFiles, activeId, activeFile, onSelect, onClose,
                   <div className="col-span-2 flex items-center gap-2">
                     <div
                       className="flex-1 min-w-0 [&_input]:text-[11px] [&_input]:leading-none [&_input]:truncate"
-                      style={{ fontFamily: EDITOR_FONTS.find((f) => f.id === editorFont)?.family }}
+                      style={{ fontFamily: EDITOR_FONTS.find((f) => f.id === settings.font)?.family }}
                     >
                       <Combobox
                         items={fontLabels}
-                        value={EDITOR_FONTS.find((f) => f.id === editorFont)?.label ?? null}
+                        value={EDITOR_FONTS.find((f) => f.id === settings.font)?.label ?? null}
                         onValueChange={(val) => {
                           const font = EDITOR_FONTS.find((f) => f.label === val);
-                          if (font) onEditorFontChange(font.id);
+                          if (font) onSettingChange("font", font.id);
                         }}
                       >
                         <ComboboxInput placeholder="Select font" showClear />
@@ -274,15 +262,15 @@ export function EditorTabs({ openFiles, activeId, activeFile, onSelect, onClose,
                       </Combobox>
                     </div>
                     <Input
-                      key={editorFontSize}
+                      key={settings.fontSize}
                       type="text"
                       inputMode="numeric"
-                      defaultValue={editorFontSize}
+                      defaultValue={settings.fontSize}
                       onBlur={(e) => {
                         const v = parseInt(e.target.value, 10);
                         const clamped = isNaN(v) ? 14 : Math.max(8, Math.min(32, v));
                         e.target.value = String(clamped);
-                        onEditorFontSizeChange(clamped);
+                        onSettingChange("fontSize", clamped);
                       }}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") e.currentTarget.blur();
@@ -292,7 +280,7 @@ export function EditorTabs({ openFiles, activeId, activeFile, onSelect, onClose,
                   </div>
                 </div>
                 {(() => {
-                  const currentFont = EDITOR_FONTS.find((f) => f.id === editorFont);
+                  const currentFont = EDITOR_FONTS.find((f) => f.id === settings.font);
                   return (
                     <div className="grid grid-cols-3 items-center gap-4">
                       <Label>&nbsp;</Label>
@@ -310,13 +298,13 @@ export function EditorTabs({ openFiles, activeId, activeFile, onSelect, onClose,
                           variant="outline"
                           size="sm"
                           className="font-normal text-xs justify-start gap-0 overflow-hidden shadow-none transition-all duration-200 active:scale-95 focus-visible:z-10"
-                          pressed={editorLigatures}
-                          onPressedChange={onEditorLigaturesChange}
+                          pressed={settings.ligatures}
+                          onPressedChange={(v) => onSettingChange("ligatures", v)}
                           disabled={!currentFont?.hasLigatures}
                         >
-                          {!currentFont?.hasLigatures ? <IconBan /> : (
-                            <span className={`inline-flex shrink-0 overflow-hidden transition-all duration-200 ${editorLigatures ? "w-4 mr-1.5" : "w-0 mr-0"}`}>
-                              {editorLigatures && <AnimatedCheck />}
+                          {!currentFont?.hasLigatures ? <IconBan className="mr-1.5" /> : (
+                            <span className={`inline-flex shrink-0 overflow-hidden transition-all duration-200 ${settings.ligatures ? "w-4 mr-1.5" : "w-0 mr-0"}`}>
+                              {settings.ligatures && <AnimatedCheck />}
                             </span>
                           )}
                           Ligatures
@@ -326,21 +314,69 @@ export function EditorTabs({ openFiles, activeId, activeFile, onSelect, onClose,
                           variant="outline"
                           size="sm"
                           className="font-normal text-xs justify-start gap-0 overflow-hidden shadow-none transition-all duration-200 active:scale-95 focus-visible:z-10"
-                          pressed={editorAltChars}
-                          onPressedChange={onEditorAltCharsChange}
+                          pressed={settings.altChars}
+                          onPressedChange={(v) => onSettingChange("altChars", v)}
                           disabled={!currentFont?.hasSS}
                         >
-                          {!currentFont?.hasSS ? <IconBan /> : (
-                            <span className={`inline-flex shrink-0 overflow-hidden transition-all duration-200 ${editorAltChars ? "w-4 mr-1.5" : "w-0 mr-0"}`}>
-                              {editorAltChars && <AnimatedCheck />}
+                          {!currentFont?.hasSS ? <IconBan className="mr-1.5" /> : (
+                            <span className={`inline-flex shrink-0 overflow-hidden transition-all duration-200 ${settings.altChars ? "w-4 mr-1.5" : "w-0 mr-0"}`}>
+                              {settings.altChars && <AnimatedCheck />}
                             </span>
                           )}
-                          Stylistic set
+                          Stylistic Sets
                         </Toggle>
                       </div>
                     </div>
                   );
                 })()}
+                <Separator />
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <Label>Editor</Label>
+                  <div className="col-span-2 flex items-center gap-2">
+                    <Toggle
+                      aria-label="Toggle invisible characters"
+                      variant="outline"
+                      size="sm"
+                      className="font-normal text-xs justify-start gap-0 overflow-hidden shadow-none transition-all duration-200 active:scale-95 focus-visible:z-10"
+                      pressed={settings.invisibles}
+                      onPressedChange={(v) => onSettingChange("invisibles", v)}
+                    >
+                      <span className={`inline-flex shrink-0 overflow-hidden transition-all duration-200 ${settings.invisibles ? "w-4 mr-1.5" : "w-0 mr-0"}`}>
+                        {settings.invisibles && <AnimatedCheck />}
+                      </span>
+                      Show invisible chars
+                    </Toggle>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <Label>&nbsp;</Label>
+                  <div className="col-span-2 flex items-center gap-2">
+                    <Toggle
+                      aria-label="Toggle powerful mode"
+                      variant="outline"
+                      size="sm"
+                      className="font-normal text-xs justify-start gap-0 overflow-hidden shadow-none transition-all duration-200 active:scale-95 focus-visible:z-10"
+                      pressed={settings.powerful}
+                      onPressedChange={(v) => onSettingChange("powerful", v)}
+                    >
+                      <span className={`inline-flex shrink-0 overflow-hidden transition-all duration-200 ${settings.powerful ? "w-4 mr-1.5" : "w-0 mr-0"}`}>
+                        {settings.powerful && <AnimatedCheck />}
+                      </span>
+                      Powerful Mode
+                      <IconSparkles2Filled className="h-2 w-2 ml-0.5" />
+                    </Toggle>
+                    {settings.powerful && (
+                      <button
+                        type="button"
+                        className="group flex items-center gap-1 text-xs text-muted-foreground cursor-pointer"
+                        onClick={() => onSettingChange("advices", !settings.advices)}
+                      >
+                        {settings.advices ? <IconCircleCheckFilled className="h-3.5 w-3.5 group-hover:text-foreground transition-colors" /> : <IconCircleDashed className="h-3.5 w-3.5 group-hover:text-foreground transition-colors" />}
+                        Code Lens
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </PopoverContent>

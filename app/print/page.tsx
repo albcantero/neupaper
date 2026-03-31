@@ -18,7 +18,7 @@ export default function PrintPage() {
           display: block !important;
         }
         article.neu-document {
-          padding: 20mm !important;
+          min-height: 297mm;
           -webkit-box-decoration-break: clone;
           box-decoration-break: clone;
         }

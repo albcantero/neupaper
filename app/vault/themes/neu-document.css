@@ -2,15 +2,42 @@
 /* Colors from Shadcn dark palette (neutral hue 0°) */
 
 .neu-document {
+  position: relative;
+  padding: 25mm 20mm;
   font-family: var(--font-geist-sans), system-ui, sans-serif;
   font-size: 11pt;
   line-height: 1.75;
   color: oklch(0.708 0 0);                              /* muted-foreground */
-  background: #0a0a0a;
+  background:
+    /* ── Guide lines ── */
+    /* Horizontal at 21mm from top */
+    linear-gradient(oklch(1 0 0 / 10%), oklch(1 0 0 / 10%)) 0 21mm / 100% 2px no-repeat,
+    /* Horizontal at 21mm from bottom */
+    linear-gradient(oklch(1 0 0 / 10%), oklch(1 0 0 / 10%)) 0 calc(100% - 19mm) / 100% 2px no-repeat,
+    /* Vertical at 16mm from left */
+    linear-gradient(oklch(1 0 0 / 10%), oklch(1 0 0 / 10%)) 16mm 0 / 2px 100% no-repeat,
+    /* Vertical at 16mm from right */
+    linear-gradient(oklch(1 0 0 / 10%), oklch(1 0 0 / 10%)) calc(100% - 14mm) 0 / 2px 100% no-repeat,
+    /* ── Corner crosses — use same 2px size as guides so calc(100%) aligns ── */
+    /* Top-left ┼ */
+    linear-gradient(oklch(0.985 0 0 / 30%), oklch(0.985 0 0 / 30%)) 14mm 21mm / 4mm 2px no-repeat,
+    linear-gradient(oklch(0.985 0 0 / 30%), oklch(0.985 0 0 / 30%)) 16mm 19mm / 2px 4mm no-repeat,
+    /* Top-right ┼ */
+    linear-gradient(oklch(0.985 0 0 / 30%), oklch(0.985 0 0 / 30%)) calc(100% - 14mm) 21mm / 4mm 2px no-repeat,
+    linear-gradient(oklch(0.985 0 0 / 30%), oklch(0.985 0 0 / 30%)) calc(100% - 16mm) 19mm / 2px 4mm no-repeat,
+    /* Bottom-left ┼ */
+    linear-gradient(oklch(0.985 0 0 / 30%), oklch(0.985 0 0 / 30%)) 14mm calc(100% - 21mm) / 4mm 2px no-repeat,
+    linear-gradient(oklch(0.985 0 0 / 30%), oklch(0.985 0 0 / 30%)) 16mm calc(100% - 19mm) / 2px 4mm no-repeat,
+    /* Bottom-right ┼ */
+    linear-gradient(oklch(0.985 0 0 / 30%), oklch(0.985 0 0 / 30%)) calc(100% - 14mm) calc(100% - 21mm) / 4mm 2px no-repeat,
+    linear-gradient(oklch(0.985 0 0 / 30%), oklch(0.985 0 0 / 30%)) calc(100% - 16mm) calc(100% - 19mm) / 2px 4mm no-repeat,
+    /* Base background */
+    #0a0a0a;
   -webkit-font-smoothing: antialiased;
   overflow-wrap: break-word;
   word-break: break-word;
 }
+
 
 .neu-document h1 {
   font-size: 26pt;

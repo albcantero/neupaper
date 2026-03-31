@@ -11,6 +11,7 @@ import { linter, lintGutter } from "@codemirror/lint";
 import type { Diagnostic } from "@codemirror/lint";
 import { lint as neuLint } from "@/lib/parser/linter";
 import { isleHighlight, isleTheme } from "@/lib/editor/isle-highlight";
+import { powerfulExtensions } from "@/lib/editor/powerful-mode";
 import { neuTheme } from "@/lib/editor/neu-theme";
 import { isleMarkdownExt } from "@/lib/editor/isle-markdown-ext";
 
@@ -107,14 +108,31 @@ interface EditorProps {
   fontSize?: number;
   ligatures?: boolean;
   altChars?: boolean;
+  invisibles?: boolean;
+  powerful?: boolean;
+  advices?: boolean;
+  dataFiles?: Record<string, string>;
 }
 
-export function Editor({ content, onChange, fontFamily = "var(--font-mono)", fontSize = 14, ligatures = true, altChars = false }: EditorProps) {
+function buildFontTheme(fontFamily: string, fontSize: number, ligatures: boolean, altChars: boolean) {
+  const features = `"liga" ${ligatures ? 1 : 0}, "calt" ${ligatures ? 1 : 0}, "ss01" ${altChars ? 1 : 0}, "ss02" ${altChars ? 1 : 0}, "ss03" ${altChars ? 1 : 0}, "ss04" ${altChars ? 1 : 0}, "ss05" ${altChars ? 1 : 0}`;
+  return EditorView.theme({
+    "&": { height: "100%", fontSize: `${fontSize}px` },
+    ".cm-scroller": { overflow: "auto", fontFamily: `${fontFamily}, monospace`, fontFeatureSettings: features },
+    ".cm-content": { padding: "16px 0", fontFamily: `${fontFamily}, monospace`, fontFeatureSettings: features },
+  });
+}
+
+export function Editor({ content, onChange, fontFamily = "var(--font-mono)", fontSize = 14, ligatures = true, altChars = false, invisibles = true, powerful = false, advices = true, dataFiles = {} }: EditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
+  const dataFilesRef = useRef(dataFiles);
+  dataFilesRef.current = dataFiles;
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
   const fontCompartment = useRef(new Compartment());
+  const invisiblesCompartment = useRef(new Compartment());
+  const powerfulCompartment = useRef(new Compartment());
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -139,7 +157,7 @@ export function Editor({ content, onChange, fontFamily = "var(--font-mono)", fon
         lintGutter(),
         linter((view) => {
           const source = view.state.doc.toString();
-          return neuLint(source).map((d): Diagnostic => ({
+          return neuLint(source, dataFilesRef.current).map((d): Diagnostic => ({
             from: d.from,
             to: d.to,
             severity: d.severity,
@@ -148,14 +166,10 @@ export function Editor({ content, onChange, fontFamily = "var(--font-mono)", fon
         }, { delay: 400 }),
         isleHighlight,
         isleTheme,
-        showIndentSpaces(),
-        showLineBreaks(),
+        invisiblesCompartment.current.of(invisibles ? [showIndentSpaces(), showLineBreaks()] : []),
+        powerfulCompartment.current.of(powerful ? powerfulExtensions(fontFamily, advices) : []),
         EditorView.lineWrapping,
-        fontCompartment.current.of(EditorView.theme({
-          "&": { height: "100%", fontSize: `${fontSize}px` },
-          ".cm-scroller": { overflow: "auto", fontFamily: `${fontFamily}, monospace`, fontFeatureSettings: `"liga" ${ligatures ? 1 : 0}, "calt" ${ligatures ? 1 : 0}, "ss01" ${altChars ? 1 : 0}, "ss02" ${altChars ? 1 : 0}, "ss03" ${altChars ? 1 : 0}, "ss04" ${altChars ? 1 : 0}, "ss05" ${altChars ? 1 : 0}` },
-          ".cm-content": { padding: "16px 0", fontFamily: `${fontFamily}, monospace`, fontFeatureSettings: `"liga" ${ligatures ? 1 : 0}, "calt" ${ligatures ? 1 : 0}, "ss01" ${altChars ? 1 : 0}, "ss02" ${altChars ? 1 : 0}, "ss03" ${altChars ? 1 : 0}, "ss04" ${altChars ? 1 : 0}, "ss05" ${altChars ? 1 : 0}` },
-        })),
+        fontCompartment.current.of(buildFontTheme(fontFamily, fontSize, ligatures, altChars)),
         EditorView.theme({
           ".cm-scroller::-webkit-scrollbar": { width: "12px", height: "12px" },
           ".cm-scroller::-webkit-scrollbar-track": { background: "transparent" },
@@ -179,13 +193,27 @@ export function Editor({ content, onChange, fontFamily = "var(--font-mono)", fon
   useEffect(() => {
     if (!viewRef.current) return;
     viewRef.current.dispatch({
-      effects: fontCompartment.current.reconfigure(EditorView.theme({
-        "&": { height: "100%", fontSize: `${fontSize}px` },
-        ".cm-scroller": { overflow: "auto", fontFamily: `${fontFamily}, monospace`, fontFeatureSettings: `"liga" ${ligatures ? 1 : 0}, "calt" ${ligatures ? 1 : 0}, "ss01" ${altChars ? 1 : 0}, "ss02" ${altChars ? 1 : 0}, "ss03" ${altChars ? 1 : 0}, "ss04" ${altChars ? 1 : 0}, "ss05" ${altChars ? 1 : 0}` },
-        ".cm-content": { padding: "16px 0", fontFamily: `${fontFamily}, monospace`, fontFeatureSettings: `"liga" ${ligatures ? 1 : 0}, "calt" ${ligatures ? 1 : 0}, "ss01" ${altChars ? 1 : 0}, "ss02" ${altChars ? 1 : 0}, "ss03" ${altChars ? 1 : 0}, "ss04" ${altChars ? 1 : 0}, "ss05" ${altChars ? 1 : 0}` },
-      })),
+      effects: fontCompartment.current.reconfigure(buildFontTheme(fontFamily, fontSize, ligatures, altChars)),
     });
   }, [fontFamily, fontSize, ligatures, altChars]);
+
+  useEffect(() => {
+    if (!viewRef.current) return;
+    viewRef.current.dispatch({
+      effects: invisiblesCompartment.current.reconfigure(
+        invisibles ? [showIndentSpaces(), showLineBreaks()] : []
+      ),
+    });
+  }, [invisibles]);
+
+  useEffect(() => {
+    if (!viewRef.current) return;
+    viewRef.current.dispatch({
+      effects: powerfulCompartment.current.reconfigure(
+        powerful ? powerfulExtensions(fontFamily, advices) : []
+      ),
+    });
+  }, [powerful, fontFamily, advices]);
 
   return <div ref={containerRef} className="h-full w-full" />;
 }

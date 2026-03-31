@@ -15,8 +15,11 @@ const cls = {
   dataBrak: Decoration.mark({ class: "isle-data-brak" }),// [ ] { } in data block
 };
 
-const KEYWORDS = /^(for|if|else if|else|end|set|data|load|config|import|create|open|close|script)\b/;
-const OPERATORS = /^(is not|is|in|then|separator=)/;
+const KEYWORDS = /^(for|if|else if|else|end|set|data|document|load|config|import|create|open|close|script)\b/;
+// Operators are context-sensitive to avoid false matches in filenames/values
+const OP_FOR = /^(in|then|separator=)(?=\s|$)/;  // only in ${ for ... }
+const OP_IF  = /^(is not|is|then|or)(?=\s|$)/;    // only in ${ if/else if ... }
+const OP_GET = /^(get)(?=\s|$)/;                  // in any ${ } block
 
 // ─── Plugin ───────────────────────────────────────────────────────
 
@@ -117,8 +120,23 @@ function tokenizeBody(
     const kw = body.slice(i).match(KEYWORDS);
     if (kw) { push(i, i + kw[0].length, cls.keyword); i += kw[0].length; continue; }
 
-    const op = body.slice(i).match(OPERATORS);
-    if (op) { push(i, i + op[0].length, cls.op); i += op[0].length; continue; }
+    // Context-sensitive operators
+    const slice = body.slice(i);
+    const isForCtx = body.startsWith("for ");
+    const isIfCtx  = body.startsWith("if ") || body.startsWith("else if ");
+
+    if (isForCtx) {
+      const op = slice.match(OP_FOR);
+      if (op) { push(i, i + op[0].length, cls.op); i += op[0].length; continue; }
+    }
+    if (isIfCtx) {
+      const op = slice.match(OP_IF);
+      if (op) { push(i, i + op[0].length, cls.op); i += op[0].length; continue; }
+    }
+    {
+      const op = slice.match(OP_GET);
+      if (op) { push(i, i + op[0].length, cls.op); i += op[0].length; continue; }
+    }
 
     const word = body.slice(i).match(/^\S+/);
     if (word) { i += word[0].length; continue; }
@@ -209,23 +227,26 @@ function tokenizeDataBlock(
 
 export const isleTheme = EditorView.baseTheme({
   ".isle-bg": {
-    backgroundColor: "rgba(139, 92, 246, 0.08)",
+    backgroundColor: "rgba(139, 92, 246, 0.12)",
     borderRadius: "3px",
   },
   ".isle-delim": {
     color: "#a78bfa",
-    fontWeight: "600",
+    fontWeight: "600 !important",
+    fontStyle: "normal !important",
   },
   ".isle-keyword": {
     color: "#818cf8",
-    fontWeight: "500",
+    fontWeight: "500 !important",
+    fontStyle: "normal !important",
   },
   ".isle-at-var": {
     color: "#34d399",
   },
   ".isle-op": {
     color: "#94a3b8",
-    fontStyle: "italic",
+    fontStyle: "italic !important",
+    fontWeight: "normal !important",
   },
   ".isle-comment": {
     color: "#475569",

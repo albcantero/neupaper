@@ -80,6 +80,103 @@ describe("linter — corchetes en data", () => {
   });
 });
 
+describe("linter — inline if no genera falso positivo", () => {
+  it("if inline con then/else no reporta bloque sin cerrar", () => {
+    const d = lint('${ if @tipo is vip then "VIP" else "Normal" }');
+    expect(d.filter((d) => d.severity === "error")).toHaveLength(0);
+  });
+
+  it("if inline solo then (sin else) no reporta bloque sin cerrar", () => {
+    const d = lint('${ if @tipo is vip then "VIP" }');
+    expect(d.filter((d) => d.severity === "error")).toHaveLength(0);
+  });
+
+  it("if bloque SIN then sí necesita ${ end }", () => {
+    const d = lint("${ if @x is vip }\nthen Hola");
+    expect(d.some((d) => d.severity === "error" && d.message.includes("if"))).toBe(true);
+  });
+});
+
+describe("linter — create/end <X>", () => {
+  it("create + end <X> correcto no da error", () => {
+    const src = '${ create <Saludo> props(nombre) }\n${ get nombre }\n${ end <Saludo> }';
+    expect(lint(src).filter((d) => d.severity === "error")).toHaveLength(0);
+  });
+
+  it("end <X> sin create da error", () => {
+    const d = lint("${ end <Saludo> }");
+    expect(d.some((d) => d.severity === "error" && d.message.includes("create"))).toBe(true);
+  });
+
+  it("get con prop no declarada da warning", () => {
+    const src = '${ create <Saludo> props(nombre) }\n${ get cargo }\n${ end <Saludo> }';
+    const warnings = lint(src).filter((d) => d.severity === "warning");
+    expect(warnings.some((d) => d.message.includes("cargo"))).toBe(true);
+  });
+
+  it("get fuera de componente da warning", () => {
+    const d = lint("${ get nombre }");
+    expect(d.some((d) => d.severity === "warning" && d.message.includes("fuera"))).toBe(true);
+  });
+});
+
+describe("linter — open/close", () => {
+  it("open + close correcto no da error", () => {
+    const src = "${ open <Table> }\ncontenido\n${ close <Table> }";
+    expect(lint(src).filter((d) => d.severity === "error")).toHaveLength(0);
+  });
+
+  it("close sin open da error", () => {
+    const d = lint("${ close <Table> }");
+    expect(d.some((d) => d.severity === "error" && d.message.includes("open"))).toBe(true);
+  });
+});
+
+describe("linter — document", () => {
+  it("document + end document correcto no da error", () => {
+    const src = "${ document }\ncontenido\n${ end document }";
+    expect(lint(src).filter((d) => d.severity === "error")).toHaveLength(0);
+  });
+
+  it("end document sin document da error", () => {
+    const d = lint("${ end document }");
+    expect(d.some((d) => d.severity === "error" && d.message.includes("document"))).toBe(true);
+  });
+});
+
+describe("linter — import y componentes", () => {
+  it("componente sin import da error", () => {
+    const d = lint("${ <Saludo nombre=Juan> }");
+    expect(d.some((d) => d.severity === "error" && d.message.includes("import"))).toBe(true);
+  });
+
+  it("componente con import no da error", () => {
+    const src = "${ import <Saludo> }\n${ <Saludo nombre=Juan> }";
+    expect(lint(src).filter((d) => d.severity === "error")).toHaveLength(0);
+  });
+});
+
+describe("linter — load collisions", () => {
+  it("dos loads con misma variable da warning", () => {
+    const dataFiles = {
+      "a.data": "nombre = X",
+      "b.data": "nombre = Y",
+    };
+    const src = "${ load a.data }\n${ load b.data }";
+    const warnings = lint(src, dataFiles).filter((d) => d.severity === "warning");
+    expect(warnings.some((d) => d.message.includes("nombre") && d.message.includes("sobreescribe"))).toBe(true);
+  });
+
+  it("dos loads sin colisión no da warning", () => {
+    const dataFiles = {
+      "a.data": "nombre = X",
+      "b.data": "email = Y",
+    };
+    const src = "${ load a.data }\n${ load b.data }";
+    expect(lint(src, dataFiles).filter((d) => d.severity === "warning")).toHaveLength(0);
+  });
+});
+
 describe("linter — variables no definidas", () => {
   it("variable definida en data no da warning", () => {
     const src = [
