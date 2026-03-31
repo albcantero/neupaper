@@ -33,7 +33,7 @@ yarn-error.log*
 # env files
 .env*
 
-# claude code
+# local config
 .claude/
 CLAUDE.md
 AGENTS.md
