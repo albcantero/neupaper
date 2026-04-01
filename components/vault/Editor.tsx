@@ -190,6 +190,18 @@ export function Editor({ content, onChange, fontFamily = "var(--font-mono)", fon
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Sync external content changes (e.g. theme selector in Preview)
+  useEffect(() => {
+    const view = viewRef.current;
+    if (!view) return;
+    const current = view.state.doc.toString();
+    if (content !== current) {
+      view.dispatch({
+        changes: { from: 0, to: current.length, insert: content },
+      });
+    }
+  }, [content]);
+
   useEffect(() => {
     if (!viewRef.current) return;
     viewRef.current.dispatch({

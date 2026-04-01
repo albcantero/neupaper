@@ -15,7 +15,7 @@ const cls = {
   dataBrak: Decoration.mark({ class: "isle-data-brak" }),// [ ] { } in data block
 };
 
-const KEYWORDS = /^(for|if|else if|else|end|set|data|document|load|config|import|create|open|close|script)\b/;
+const KEYWORDS = /^(for|if|else if|else|end|set|data|document|load|config|import|create|open|close|script|pagebreak)\b/;
 // Operators are context-sensitive to avoid false matches in filenames/values
 const OP_FOR = /^(in|then|separator=)(?=\s|$)/;  // only in ${ for ... }
 const OP_IF  = /^(is not|is|then|or)(?=\s|$)/;    // only in ${ if/else if ... }
@@ -113,15 +113,34 @@ function tokenizeBody(
     if (body[i] === " " || body[i] === "\t") { i++; continue; }
 
     if (body[i] === "@") {
-      const m = body.slice(i).match(/^@[\w.]+/);
+      const m = body.slice(i).match(/^@[\w.\-]+/);
       if (m) { push(i, i + m[0].length, cls.atVar); i += m[0].length; continue; }
     }
 
     const kw = body.slice(i).match(KEYWORDS);
     if (kw) { push(i, i + kw[0].length, cls.keyword); i += kw[0].length; continue; }
 
-    // Context-sensitive operators
+    // Context-sensitive: config — key=value, key="quoted", bare-flag
     const slice = body.slice(i);
+    if (body.startsWith("config ")) {
+      // key="value" or key=value
+      const kv = slice.match(/^([\w-]+)(=)(?:"([^"]*)"|(\S+))/);
+      if (kv) {
+        const keyEnd = i + kv[1].length;
+        push(i, keyEnd, cls.dataKey);
+        push(keyEnd, keyEnd + 1, cls.dataEq);
+        // Value starts right after = (include quotes if present)
+        const valFrom = keyEnd + 1;
+        const valTo = i + kv[0].length;
+        push(valFrom, valTo, cls.dataVal);
+        i += kv[0].length; continue;
+      }
+      // bare flag (no =)
+      const flag = slice.match(/^[\w-]+/);
+      if (flag) { push(i, i + flag[0].length, cls.dataKey); i += flag[0].length; continue; }
+    }
+
+    // Context-sensitive operators
     const isForCtx = body.startsWith("for ");
     const isIfCtx  = body.startsWith("if ") || body.startsWith("else if ");
 

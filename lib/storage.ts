@@ -41,7 +41,7 @@ export function createFile(name: string): NeuFile {
     id: crypto.randomUUID(),
     name: fileName,
     path: fileName,
-    content: "",
+    content: `\${ config theme="neu-document" page-numbers header="New document" }\n\n\${ data }\n  app = Neupaper\n\${ end data }\n\n\n\n\${ document }\n\n# Title\nHey! I am using **\${ @app }**\n\n\${ end document }`,
     createdAt: Date.now(),
     updatedAt: Date.now(),
   };
@@ -87,40 +87,209 @@ export function updateFile(
   return all[idx];
 }
 
-export const DEFAULT_DOCUMENT_CONTENT = `# My notes
+export const DEFAULT_DOCUMENT_CONTENT = `\${ config theme="neu-document" page-numbers header="New document" }
 
-Hey, I am using **Neupaper**!
+\${ data }
+  app = Neupaper
+\${ end data }
+
+
+
+\${ document }
+
+# Title
+Hey! I am using **\${ @app }**
+
+\${ end document }
+`;
+
+export const EXAMPLE_TERMS_ISLE = `\${ create <Terms> props() }
+- Payment: 50% upfront, 50% on delivery
+- Includes two rounds of revisions per phase
+- Additional work billed at $120/hour
+- Source code and documentation transferred on completion
+- 90-day warranty covering defects in delivered work
+\${ end <Terms> }
+`;
+
+export const EXAMPLE_PROJECT_PROPOSAL = `\${ config theme="modernist" page-numbers header="Project proposal" }
+
+\${ data }
+  project.name = Platform Migration
+  project.client = Globex Inc
+  project.date = April 2026
+  project.budget = 24000
+
+  phases props(name, start, duration) = [
+    Discovery, 2026-04-07, 5d
+    Design, 2026-04-14, 10d
+    Development, 2026-04-28, 20d
+    Testing, 2026-05-26, 5d
+    Launch, 2026-06-02, 2d
+  ]
+\${ end data }
+
+\${ import <Terms> }
+
+\${ document }
+
+# \${ @project.name }
+
+**Client:** \${ @project.client }
+**Date:** \${ @project.date }
+**Budget:** $\${ @project.budget }
+
+---
+
+### Overview
+
+This proposal outlines the migration of \${ @project.client }'s legacy monolith to a modern microservices architecture. The project is divided into five phases, spanning approximately two months from kickoff to launch.
+
+The current system runs on a single Rails application deployed to a managed VM. Over the past three years, the codebase has grown to 180k lines with tightly coupled modules that make independent scaling impossible. Response times during peak hours regularly exceed 2 seconds, and deployments require a full 20-minute restart cycle.
+
+Our approach replaces the monolith with a set of focused services behind an API gateway. Each service owns its data, communicates via async events, and deploys independently. This gives \${ @project.client } the ability to scale individual components, ship features faster, and reduce incident blast radius.
+
+### Timeline
+
+\`\`\`mermaid
+gantt
+  title \${ @project.name }
+  dateFormat YYYY-MM-DD
+  \${ for phase in @phases }
+    \${ phase.name } : \${ phase.start }, \${ phase.duration }
+  \${ end }
+\`\`\`
+### Phases
+
+\${ for phase in @phases }
+- **\${ phase.name }** — starts \${ phase.start }, duration \${ phase.duration }
+\${ end }
+
+\${ pagebreak }
+
+### Discovery
+
+During the first week we audit the existing codebase, map service boundaries, and identify shared state that needs careful extraction. We conduct interviews with the engineering team to understand pain points and undocumented dependencies. The output is a service dependency graph and a migration risk assessment.
+
+### Design
+
+The design phase produces API contracts, database schemas, and infrastructure diagrams for each service. We define the event bus topology, establish observability standards, and create a runbook template. All artifacts go through a review cycle with \${ @project.client }'s lead engineers before development begins.
+
+### Development
+
+Development follows a strangler-fig pattern: new services are built alongside the monolith, with traffic gradually shifted via feature flags. We prioritize the authentication and billing services first, as they have the cleanest boundaries. Each service includes unit tests, integration tests, and a CI/CD pipeline from day one.
+
+### Testing & Launch
+
+The final two phases cover end-to-end testing under production-like load, followed by a staged rollout. We run shadow traffic for 48 hours before cutting over. Rollback procedures are documented and rehearsed. Post-launch, we provide two weeks of on-call support at no additional cost.
+
+---
+---
+
+### Terms
+
+\${ <Terms> }
+
+\${ end document }
+`;
+
+export const EXAMPLE_ISSUE_REVIEW = `\${ config theme="neu-document" }
+
+\${ document }
+
+# Issue Review — Auth middleware timeout
+
+**Status:** Open · **Priority:** High · **Assignee:** @daniela
+
+---
+
+## Description
+
+Users are experiencing intermittent 504 errors when the auth middleware takes longer than 3s to validate session tokens. The issue started after deploying v2.4.1.
+
+## Root cause
+
+The token validation calls an external JWKS endpoint on every request instead of caching the public key:
+
+\`\`\`tsx
+async function validateToken(token: string) {
+  const jwks = await fetch(process.env.JWKS_URL!);
+  const key = await jwks.json();
+  return jwt.verify(token, key.keys[0]);
+}
+\`\`\`
+
+## Proposed fix
+
+Cache the JWKS response with a 1-hour TTL. This reduces external calls from ~12k/min to ~1/hour.
+
+## Next steps
+
+- [ ] Implement JWKS cache with TTL
+- [ ] Add circuit breaker for JWKS endpoint
+- [ ] Monitor p99 latency after deploy
+
+\${ end document }
+`;
+
+export const EXAMPLE_CLIENT_REPORT = `\${ config theme="neu-document" page-numbers header="Client report" }
+
+\${ load clients (example).data }
+
+\${ document }
+
+# Client Report — \${ @company.name }
+
+**Prepared by:** \${ @company.name } · \${ @company.email }
+**Date:** \${ @company.date }
+
+---
+
+## Report
+
+| Client | Plan | Revenue |
+|--------|------|---------|
+\${ for client in @clients }
+| \${ client.name } | \${ client.plan } | \${ if client.plan is pro then client.revenue else "nothing" } |
+\${ end }
+
+---
+
+## Notes
+\${ for client in @clients }
+  \${ if client.plan is pro }
+  - **\${ client.name }** — generating $\${ client.revenue } in monthly revenue.
+  \${ else }
+  - **\${ client.name }** — free tier, no revenue yet.
+  \${ end }
+\${ end }
+
+\${ end document }
+`;
+
+export const EXAMPLE_CLIENTS_DATA = `\${ data }
+  company.name = Neupaper
+  company.email = hello@neupaper.app
+  company.date = March 31, 2026
+
+  clients props(name, plan, revenue) = [
+    Acme Corp, pro, 1200
+    Globex Inc, free, 0
+    Initech, pro, 800
+    Umbrella Ltd, free, 0
+    Stark Industries, pro, 3500
+  ]
+\${ end data }
 `;
 
 const DEFAULT_VAULT_STRUCTURE: { path: string; content: string }[] = [
-  { path: "components/built-in/Table.isle", content: "" },
-  { path: "components/built-in/TotalRow.isle", content: "" },
-  { path: "components/built-in/Sum.isle", content: "" },
-  { path: "components/built-in/Header.isle", content: "" },
-  { path: "components/built-in/Footer.isle", content: "" },
-  { path: "components/built-in/PageBreak.isle", content: "" },
-  { path: "components/built-in/Divider.isle", content: "" },
-  { path: "components/built-in/Signature.isle", content: "" },
-  { path: "components/built-in/Stamp.isle", content: "" },
-  { path: "components/built-in/Terms.isle", content: "" },
-  { path: "components/built-in/QR.isle", content: "" },
-  { path: "components/built-in/Badge.isle", content: "" },
-  { path: "components/built-in/Highlight.isle", content: "" },
-  { path: "components/built-in/Note.isle", content: "" },
-  { path: "components/Greeting.isle", content: "" },
-  { path: "components/Signature.isle", content: "" },
-  { path: "data/clients.data", content: "" },
-  { path: "data/invoices.data", content: "" },
+  { path: "components/Terms.isle", content: EXAMPLE_TERMS_ISLE },
+  { path: "data/clients (example).data", content: EXAMPLE_CLIENTS_DATA },
 ];
 
 /** Seeds the vault with the default structure on first visit. Returns the default document id if created. */
 export function initVault(): string | null {
   if (typeof window === "undefined") return null;
-  // Migration: remove legacy components/ui/ files (renamed to components/built-in/)
-  const all = readAll();
-  const withoutLegacy = all.filter((f) => !f.path.startsWith("components/ui/"));
-  if (withoutLegacy.length !== all.length) writeAll(withoutLegacy);
-
   const existing = readAll();
   const existingPaths = new Set(existing.map((f) => f.path));
   const toCreate = DEFAULT_VAULT_STRUCTURE.filter(
@@ -139,8 +308,32 @@ export function initVault(): string | null {
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
+    const exampleDoc: NeuFile = {
+      id: crypto.randomUUID(),
+      name: "client-report (example).neu",
+      path: "client-report (example).neu",
+      content: EXAMPLE_CLIENT_REPORT,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+    const proposalDoc: NeuFile = {
+      id: crypto.randomUUID(),
+      name: "project-proposal (example).neu",
+      path: "project-proposal (example).neu",
+      content: EXAMPLE_PROJECT_PROPOSAL,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+    const issueDoc: NeuFile = {
+      id: crypto.randomUUID(),
+      name: "issue-review (example).md",
+      path: "issue-review (example).md",
+      content: EXAMPLE_ISSUE_REVIEW,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
     defaultDocId = defaultDoc.id;
-    writeAll([...existing, defaultDoc]);
+    writeAll([...existing, defaultDoc, exampleDoc, proposalDoc, issueDoc]);
   }
 
   if (toCreate.length === 0) return defaultDocId;

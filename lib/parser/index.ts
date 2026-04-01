@@ -16,6 +16,14 @@ function collectImports(nodes: ASTNode[]): Set<string> {
   return imports;
 }
 
+/** Extract config options from the AST */
+function collectConfig(nodes: ASTNode[]): Record<string, string> {
+  for (const node of nodes) {
+    if (node.type === "config") return node.options;
+  }
+  return {};
+}
+
 /**
  * Parse a Markdown Isles source string and return clean Markdown.
  *
@@ -49,4 +57,36 @@ export function parse(
   }
   result = resolveComponents(result, allowedComponents, evalCtx);
   return result;
+}
+
+export interface ParseResult {
+  html: string;
+  config: Record<string, string>;
+}
+
+/** Parse and return both HTML and config options */
+export function parseWithConfig(
+  source: string,
+  ctx: DataObject = {},
+  components: Record<string, string> = {},
+  dataFiles: Record<string, string> = {},
+): ParseResult {
+  const tokens = tokenize(source);
+  const ast    = buildAST(tokens);
+  const evalCtx = structuredClone(ctx);
+  const imports = collectImports(ast);
+  const config  = collectConfig(ast);
+
+  const preamble = ast.filter((n) => n.type !== "document");
+  evaluate(preamble, evalCtx, {}, dataFiles);
+
+  const docNode = ast.find((n) => n.type === "document");
+  let result = docNode ? evaluate([docNode], evalCtx, {}, dataFiles) : "";
+
+  const allowedComponents: Record<string, string> = {};
+  for (const name of imports) {
+    if (components[name]) allowedComponents[name] = components[name];
+  }
+  result = resolveComponents(result, allowedComponents, evalCtx);
+  return { html: result, config };
 }

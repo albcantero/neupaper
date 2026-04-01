@@ -57,9 +57,7 @@ function paragraphMargins(p: HTMLElement, isFirstOnPage: boolean): number {
 
 /** Serialize an element (clone) to an HTML string. */
 function toHtml(el: HTMLElement): string {
-  return el.cloneNode(true) as HTMLElement
-    ? (el.cloneNode(true) as HTMLElement).outerHTML
-    : "";
+  return (el.cloneNode(true) as HTMLElement).outerHTML;
 }
 
 /** Copy the element's tag name, class, and attributes onto a wrapper. */
@@ -239,7 +237,7 @@ export function partitionPages(article: HTMLElement): PageContent[] {
           startNewPage();
           // Measure second list
           const tmp = document.createElement("div");
-          tmp.style.cssText = "position:absolute;left:-9999px;width:210mm;visibility:hidden";
+          tmp.style.cssText = "position:absolute;left:-9999px;width:170mm;visibility:hidden";
           tmp.appendChild(secondList.cloneNode(true));
           document.body.appendChild(tmp);
           const secondH = elementHeight(tmp.firstElementChild as HTMLElement, true);
@@ -273,7 +271,7 @@ export function partitionPages(article: HTMLElement): PageContent[] {
         // We create a temporary element to measure it
         const tmp = document.createElement("div");
         tmp.style.cssText =
-          "position:absolute;left:-9999px;width:210mm;visibility:hidden";
+          "position:absolute;left:-9999px;width:170mm;visibility:hidden";
         tmp.innerHTML = split.second;
         document.body.appendChild(tmp);
         const secondChild = tmp.firstElementChild as HTMLElement | null;

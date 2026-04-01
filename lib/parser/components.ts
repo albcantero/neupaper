@@ -59,8 +59,9 @@ function resolveOne(
   if (!isleSrc) return match;
 
   // Extract body between ${ create <Name> ... } and ${ end <Name> }
+  const esc = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const createRe = new RegExp(
-    `\\$\\{\\s*create\\s+<${name}>(?:\\s+props\\(([^)]*)\\))?\\s*\\}([\\s\\S]*?)\\$\\{\\s*end\\s+<${name}>\\s*\\}`,
+    `\\$\\{\\s*create\\s+<${esc}>(?:\\s+props\\(([^)]*)\\))?\\s*\\}([\\s\\S]*?)\\$\\{\\s*end\\s+<${esc}>\\s*\\}`,
   );
   const bodyMatch = isleSrc.match(createRe);
   if (!bodyMatch) return match;

@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
 
     // 2. Inject HTML into the empty <article> — no URL size limits
     await page.evaluate((content) => {
-      const article = document.querySelector("article.neu-document");
+      const article = document.querySelector("article.neu-print");
       if (article) article.innerHTML = content;
     }, html);
 

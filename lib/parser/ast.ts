@@ -13,7 +13,7 @@ type Frame =
   | { kind: "root"; children: ASTNode[] }
   | { kind: "for";  children: ASTNode[] }
   | { kind: "if";   node: Extract<ASTNode, { type: "if" }>; branch: IfBranch }
-  | { kind: "component"; children: ASTNode[] }
+  | { kind: "component"; name: string; children: ASTNode[] }
   | { kind: "document"; children: ASTNode[] };
 
 // ─── Helpers ──────────────────────────────────────────────────────
@@ -53,8 +53,11 @@ function parseInlineValue(val: string): ASTNode {
 
 function parseConfig(body: string): Record<string, string> {
   const options: Record<string, string> = {};
-  for (const m of body.matchAll(/@([\w]+)(?::([\w-]+))?/g)) {
-    options[m[1]] = m[2] ?? "true";
+  // Strip "config" keyword
+  const rest = body.replace(/^config\s*/, "");
+  // key="quoted value" or key=value or bare-flag
+  for (const m of rest.matchAll(/([\w-]+)(?:=(?:"([^"]*)"|(\S+)))?/g)) {
+    options[m[1]] = m[2] ?? m[3] ?? "yes";
   }
   return options;
 }
@@ -114,13 +117,15 @@ export function buildAST(tokens: Token[]): ASTNode[] {
         children: [],
       };
       current().push(node);
-      frames.push({ kind: "component", children: node.children });
+      frames.push({ kind: "component", name: openMatch[1], children: node.children });
       continue;
     }
 
     // ── Close component ─────────────────────────────────────────
-    if (/^close\s+<[A-Z]\w*>$/.test(body)) {
-      if (frames.length > 1 && frames[frames.length - 1].kind === "component") {
+    const closeMatch = body.match(/^close\s+<([A-Z]\w*)>$/);
+    if (closeMatch) {
+      const top = frames[frames.length - 1];
+      if (frames.length > 1 && top.kind === "component" && top.name === closeMatch[1]) {
         frames.pop();
       }
       continue;

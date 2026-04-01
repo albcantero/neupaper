@@ -7,6 +7,7 @@ import remarkBreaks from "remark-breaks";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import rehypeRaw from "rehype-raw";
+import rehypeHighlight from "rehype-highlight";
 import "katex/dist/katex.min.css";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,9 +19,21 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
-import { IconZoomIn, IconZoomOut, IconDownload, IconFile, IconLayoutList } from "@tabler/icons-react";
-import { parse } from "@/lib/parser";
+import { IconPlus, IconMinus, IconDownload, IconPalette, IconFiles, IconFilesOff } from "@tabler/icons-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/ui/combobox";
+import { Separator } from "@/components/ui/separator";
+import { parseWithConfig } from "@/lib/parser";
 import { partitionPages, type PageContent } from "@/lib/page-partitioner";
+import { wrapSections, formatPageNumber } from "@/app/vault/themes/theme-utils";
 
 // ─── Mermaid ──────────────────────────────────────────────────────
 
@@ -111,7 +124,7 @@ function MermaidBlock({ code }: { code: string }) {
 
 const mdComponents = {
   code({ className, children, ...props }: React.ComponentPropsWithoutRef<"code"> & { className?: string }) {
-    if (className === "language-mermaid") {
+    if (className?.includes("language-mermaid")) {
       const code = children != null ? String(children).trim() : "";
       if (!code) return null;
       return <MermaidBlock code={code} />;
@@ -121,19 +134,51 @@ const mdComponents = {
 };
 
 const remarkPlugins = [remarkGfm, remarkBreaks, remarkMath] as Parameters<typeof ReactMarkdown>[0]["remarkPlugins"];
-const rehypePlugins = [rehypeRaw, rehypeKatex] as Parameters<typeof ReactMarkdown>[0]["rehypePlugins"];
+const rehypePlugins = [rehypeRaw, rehypeKatex, rehypeHighlight] as Parameters<typeof ReactMarkdown>[0]["rehypePlugins"];
 
 // ─── A4 Page ─────────────────────────────────────────────────────
 
-function A4Page({ scale, origin, html }: { scale: number; origin: string; html: string }) {
+interface A4PageProps {
+  scale: number;
+  origin: string;
+  html: string;
+  theme: string;
+  pageNumber?: number;
+  totalPages?: number;
+  header?: string | null;
+}
+
+function A4Page({ scale, origin, html, theme, pageNumber, totalPages, header }: A4PageProps) {
+  const isMinimal = theme === "modernist";
+  let finalHtml = isMinimal ? wrapSections(html) : html;
+
+  // For modernist, inject header/page-number as HTML inside the theme div
+  if (isMinimal) {
+    const headerHtml = header ? `<div class="neu-header">${header}</div>` : "";
+    const pageNumHtml = pageNumber != null && totalPages != null
+      ? `<div class="neu-page-number">${formatPageNumber(pageNumber, totalPages!, theme)}</div>`
+      : "";
+    finalHtml = headerHtml + finalHtml + pageNumHtml;
+  }
+
   return (
     <div
       className="relative w-[210mm] h-[297mm] bg-[#0a0a0a] border border-white/[0.08] shrink-0 break-words shadow-[inset_0_0_1px_1.5px_hsla(0,0%,100%,0.15)]"
       style={{ transform: `scale(${scale})`, transformOrigin: origin }}
     >
       <div className="h-full overflow-hidden [&>.neu-document]:h-full">
-        <div className="neu-document" dangerouslySetInnerHTML={{ __html: html }} />
+        <div className={theme} dangerouslySetInnerHTML={{ __html: finalHtml }} />
       </div>
+      {!isMinimal && header && (
+        <div className="absolute top-[8mm] left-[16mm] text-[12pt] text-white/30 pointer-events-none font-[family-name:var(--font-geist-mono)] pl-[10pt]">
+          {header}
+        </div>
+      )}
+      {!isMinimal && pageNumber != null && totalPages != null && (
+        <div className="absolute bottom-[8mm] right-[16mm] text-[12pt] text-white/30 pointer-events-none font-[family-name:var(--font-geist-mono)] pr-[10pt]">
+          {formatPageNumber(pageNumber, totalPages, theme)}
+        </div>
+      )}
     </div>
   );
 }
@@ -163,17 +208,51 @@ function prevStep(current: number): number {
   return current;
 }
 
+const DOCUMENT_THEMES = [
+  { id: "neu-document", label: "Neu Document" },
+  { id: "modernist", label: "Modernist" },
+] as const;
+
 interface PreviewProps {
   content: string;
   components?: Record<string, string>;
   dataFiles?: Record<string, string>;
+  onContentChange?: (content: string) => void;
 }
 
-export function Preview({ content, components = {}, dataFiles = {} }: PreviewProps) {
-  const markdown = useMemo(() => {
-    try { return parse(content, {}, components, dataFiles); }
-    catch { return content; }
+export function Preview({ content, components = {}, dataFiles = {}, onContentChange }: PreviewProps) {
+  const { markdown, pageNumbers, header, theme } = useMemo(() => {
+    try {
+      const result = parseWithConfig(content, {}, components, dataFiles);
+      return {
+        markdown: result.html,
+        pageNumbers: result.config["page-numbers"] === "yes",
+        header: result.config["header"] ?? null,
+        theme: result.config["theme"] || "neu-document",
+      };
+    } catch {
+      return { markdown: content, pageNumbers: false, header: null, theme: "neu-document" };
+    }
   }, [content, components, dataFiles]);
+
+  const changeTheme = useCallback((themeId: string) => {
+    if (!onContentChange) return;
+    const configRegex = /^\$\{\s*config\b([^}]*)\}\s*$/m;
+    const match = content.match(configRegex);
+    if (match) {
+      const line = match[0];
+      const themeParamRegex = /theme="[^"]*"|theme=\S+/;
+      let newLine: string;
+      if (themeParamRegex.test(line)) {
+        newLine = line.replace(themeParamRegex, `theme="${themeId}"`);
+      } else {
+        newLine = line.replace(/\}\s*$/, ` theme="${themeId}" }`);
+      }
+      onContentChange(content.replace(line, newLine));
+    } else {
+      onContentChange(`\${ config theme="${themeId}" }\n${content}`);
+    }
+  }, [content, onContentChange]);
 
   const [zoomPct, setZoomPct] = useState(ZOOM_DEFAULT);
   const [exporting, setExporting] = useState(false);
@@ -238,10 +317,21 @@ export function Preview({ content, components = {}, dataFiles = {} }: PreviewPro
   const exportPdf = async () => {
     setExporting(true);
     try {
-      // Concatenate all pages with pagebreak divs between them
+      // Wrap each page in its own neu-document div (full A4 with guides, page-break between)
+      const total = pages.length;
       const fullHtml = pages
-        .map((page) => page.fragments.join(""))
-        .join('<div class="neu-pagebreak"></div>');
+        .map((page, i) => {
+          const raw = page.fragments.join("");
+          const content = theme === "modernist" ? wrapSections(raw) : raw;
+          const headerEl = header
+            ? `<div class="neu-header">${header}</div>`
+            : "";
+          const pageNum = pageNumbers
+            ? `<div class="neu-page-number">${formatPageNumber(i + 1, total, theme)}</div>`
+            : "";
+          return `<div class="${theme} neu-page"${i > 0 ? ' style="break-before:page"' : ''}>${headerEl}${content}${pageNum}</div>`;
+        })
+        .join("");
 
       const res = await fetch("/api/export-pdf", {
         method: "POST",
@@ -321,7 +411,7 @@ export function Preview({ content, components = {}, dataFiles = {} }: PreviewPro
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col relative group/preview">
       {/* Hidden measurement container — same width as A4 page */}
       <div
         style={{
@@ -333,7 +423,7 @@ export function Preview({ content, components = {}, dataFiles = {} }: PreviewPro
           pointerEvents: "none",
         }}
       >
-        <article ref={measureRef} className="neu-document">
+        <article ref={measureRef} className={theme}>
           <ReactMarkdown
             remarkPlugins={remarkPlugins}
             rehypePlugins={rehypePlugins}
@@ -342,12 +432,12 @@ export function Preview({ content, components = {}, dataFiles = {} }: PreviewPro
         </article>
       </div>
 
-      {/* Toolbar */}
-      <div className="flex items-center gap-1 px-3 py-1.5 border-b bg-card">
-        <Button variant="ghost" size="icon-xs" onClick={zoomOut} disabled={zoomPct <= ZOOM_MIN}>
-          <IconZoomOut className="h-3.5 w-3.5" />
+      {/* Toolbar — floating on hover */}
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 px-3 py-1.5 bg-card border border-border rounded-lg shadow-lg opacity-0 group-hover/preview:opacity-100 transition-opacity duration-200">
+        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={zoomOut} disabled={zoomPct <= ZOOM_MIN}>
+          <IconMinus className="h-4 w-4" />
         </Button>
-        <div className="relative flex items-center">
+        <div className="relative flex items-center justify-center w-12">
           <input
             type="number"
             min={ZOOM_MIN}
@@ -358,54 +448,79 @@ export function Preview({ content, components = {}, dataFiles = {} }: PreviewPro
               if (!isNaN(v)) setZoomPct(clampZoom(v));
             }}
             onDoubleClick={zoomReset}
-            className="text-xs text-muted-foreground tabular-nums w-10 text-right bg-transparent border-none outline-none focus:text-foreground [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [caret-color:currentColor]"
+            className="text-xs text-muted-foreground tabular-nums w-6 text-center bg-transparent border-none outline-none focus:text-foreground [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [caret-color:currentColor] p-0"
           />
           <span className="text-xs text-muted-foreground">%</span>
         </div>
-        <Button variant="ghost" size="icon-xs" onClick={zoomIn} disabled={zoomPct >= ZOOM_MAX}>
-          <IconZoomIn className="h-3.5 w-3.5" />
+        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={zoomIn} disabled={zoomPct >= ZOOM_MAX}>
+          <IconPlus className="h-4 w-4" />
         </Button>
 
-        <div className="flex-1" />
+        <Separator orientation="vertical" className="data-[orientation=vertical]:h-4 mx-1" />
 
-        {/* Pagination (single mode only) */}
-        {viewMode === "single" && totalPages > 1 && (
-          <Pagination className="w-auto mx-0">
-            <PaginationContent className="gap-0.5">
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() => goToPage(currentPage - 1)}
-                  className={`cursor-pointer select-none h-7 text-xs px-2 ${currentPage === 0 ? "pointer-events-none opacity-50" : ""}`}
-                />
-              </PaginationItem>
-              {buildPageLinks()}
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() => goToPage(currentPage + 1)}
-                  className={`cursor-pointer select-none h-7 text-xs px-2 ${currentPage === totalPages - 1 ? "pointer-events-none opacity-50" : ""}`}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        )}
-
-        <div className="flex-1" />
-
-        <Button
-          variant="ghost"
-          size="icon-xs"
-          onClick={() => setViewMode((m) => m === "single" ? "scroll" : "single")}
-          title={viewMode === "single" ? "Scroll view" : "Single page"}
+        <IconPalette className="h-4 w-4 text-muted-foreground" />
+        <Combobox
+          items={DOCUMENT_THEMES.map((t) => t.label)}
+          value={DOCUMENT_THEMES.find((t) => t.id === theme)?.label ?? null}
+          onValueChange={(val) => {
+            const t = DOCUMENT_THEMES.find((t) => t.label === val);
+            if (t) changeTheme(t.id);
+          }}
         >
-          {viewMode === "single" ? <IconLayoutList className="h-3.5 w-3.5" /> : <IconFile className="h-3.5 w-3.5" />}
-        </Button>
-        <Button variant="ghost" size="icon-xs" onClick={exportPdf} disabled={exporting} title="Export PDF">
-          <IconDownload className="h-3.5 w-3.5" />
+          <ComboboxInput placeholder="Theme" showClear={false} className="h-7 text-xs w-40" />
+          <ComboboxContent>
+            <ComboboxEmpty>No themes found.</ComboboxEmpty>
+            <ComboboxList>
+              {(item) => {
+                const t = DOCUMENT_THEMES.find((t) => t.label === item);
+                return (
+                  <ComboboxItem key={item} value={item}>
+                    <span className="flex-1">{item}</span>
+                    {t?.id === "modernist" && <span className="ml-auto text-[9px] font-mono font-medium text-white border border-white rounded-sm px-1 h-4 inline-flex items-center">BETA</span>}
+                  </ComboboxItem>
+                );
+              }}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>
+
+        <Separator orientation="vertical" className="data-[orientation=vertical]:h-4 mx-1" />
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon" className="h-7 w-7"
+                onClick={() => setViewMode((m) => m === "single" ? "scroll" : "single")}
+              >
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.span
+                    key={viewMode}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.05 }}
+                    className="flex items-center justify-center"
+                  >
+                    {viewMode === "single" ? <IconFiles className="h-4 w-4" /> : <IconFilesOff className="h-4 w-4" />}
+                  </motion.span>
+                </AnimatePresence>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              Scroll view
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <Button variant="ghost" size="sm" className="h-7 px-2 text-xs gap-1.5" onClick={exportPdf} disabled={exporting}>
+          <IconDownload className="h-4 w-4" />
+          Download
         </Button>
       </div>
 
       {/* Canvas */}
-      <div ref={canvasRef} className="flex-1 overflow-auto flex justify-center bg-card bg-[radial-gradient(var(--border)_1px,transparent_1px)] bg-[length:24px_24px] [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar]:h-3 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:border-[4px] [&::-webkit-scrollbar-thumb]:border-transparent [&::-webkit-scrollbar-thumb]:[background-clip:padding-box]">
+      <div ref={canvasRef} className="flex-1 overflow-auto flex justify-center bg-card bg-[radial-gradient(var(--border)_1px,transparent_1px)] bg-[length:24px_24px] pt-2 [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar]:h-3 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:border-[4px] [&::-webkit-scrollbar-thumb]:border-transparent [&::-webkit-scrollbar-thumb]:[background-clip:padding-box]">
         {viewMode === "single" ? (
           <div
             className="shrink-0"
@@ -417,7 +532,7 @@ export function Preview({ content, components = {}, dataFiles = {} }: PreviewPro
               justifyContent: "center",
             }}
           >
-            <A4Page scale={scale} origin="center center" html={pages[currentPage]?.fragments.join("") ?? ""} />
+            <A4Page scale={scale} origin="center center" html={pages[currentPage]?.fragments.join("") ?? ""} theme={theme} pageNumber={pageNumbers ? currentPage + 1 : undefined} totalPages={pageNumbers ? pages.length : undefined} header={header} />
           </div>
         ) : (
           <div
@@ -436,12 +551,35 @@ export function Preview({ content, components = {}, dataFiles = {} }: PreviewPro
                   height: `calc(297mm * ${scale})`,
                 }}
               >
-                <A4Page scale={scale} origin="top left" html={page.fragments.join("")} />
+                <A4Page scale={scale} origin="top left" html={page.fragments.join("")} theme={theme} pageNumber={pageNumbers ? i + 1 : undefined} totalPages={pageNumbers ? pages.length : undefined} header={header} />
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Bottom toolbar — pagination */}
+      {viewMode === "single" && totalPages > 1 && (
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 px-3 py-1.5 bg-card border border-border rounded-lg shadow-lg opacity-0 group-hover/preview:opacity-100 transition-opacity duration-200">
+          <Pagination className="w-auto mx-0">
+            <PaginationContent className="gap-0.5">
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => goToPage(currentPage - 1)}
+                  className={`cursor-pointer select-none h-7 text-xs px-2 ${currentPage === 0 ? "pointer-events-none opacity-50" : ""}`}
+                />
+              </PaginationItem>
+              {buildPageLinks()}
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => goToPage(currentPage + 1)}
+                  className={`cursor-pointer select-none h-7 text-xs px-2 ${currentPage === totalPages - 1 ? "pointer-events-none opacity-50" : ""}`}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </div>
   );
 }

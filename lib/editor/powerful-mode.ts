@@ -223,6 +223,7 @@ const railPlugin = ViewPlugin.fromClass(
         else if (body === "data")          blockStack.push({ kind: "data", startLine: line, depth: blockStack.length });
         else if (body === "document")      blockStack.push({ kind: "document", startLine: line, depth: blockStack.length });
         else if (body.startsWith("open ")) blockStack.push({ kind: "component", startLine: line, depth: blockStack.length });
+        else if (body.startsWith("create ")) blockStack.push({ kind: "component", startLine: line, depth: blockStack.length });
         else if (body === "end" || body === "end data" || body === "end document" || body.startsWith("end <") || body.startsWith("close ")) {
           if (blockStack.length > 0) {
             const opened = blockStack.pop()!;
@@ -277,7 +278,7 @@ const railPlugin = ViewPlugin.fromClass(
       const input = Decoration.mark({ class: "powerful-input" });
 
       // @variables — @ as icon chip, name as input chip
-      for (const m of rawContent.matchAll(/@[\w.]+/g)) {
+      for (const m of rawContent.matchAll(/@[\w.\-]+/g)) {
         const atFrom = contentStart + m.index!;
         marks.push({ from: atFrom, to: atFrom + 1, value: atSignMark });
         marks.push({ from: atFrom + 1, to: atFrom + m[0].length, value: varNameMark });
@@ -329,7 +330,16 @@ const railPlugin = ViewPlugin.fromClass(
         }
       }
 
-      // Component prop values: "nombre=Juan" → [Juan]
+      // Get prop name: "get [name]"
+      const getMatch = body.match(/^get\s+(\S+)/);
+      if (getMatch) {
+        const propStart = rawContent.indexOf(getMatch[1], 4); // skip "get "
+        if (propStart !== -1) {
+          marks.push({ from: contentStart + propStart, to: contentStart + propStart + getMatch[1].length, value: input });
+        }
+      }
+
+      // Prop/config values: "key=value" or "key="quoted"" → highlight [value]
       for (const m of rawContent.matchAll(/=(?:"([^"]*)"|([^\s>]+))/g)) {
         const val = m[1] ?? m[2];
         const valOffset = m[1] !== undefined ? m.index! + 2 : m.index! + 1;

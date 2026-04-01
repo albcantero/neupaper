@@ -3,6 +3,7 @@
 
 .neu-document {
   position: relative;
+  min-height: 297mm;
   padding: 25mm 20mm;
   font-family: var(--font-geist-sans), system-ui, sans-serif;
   font-size: 11pt;
@@ -11,26 +12,26 @@
   background:
     /* ── Guide lines ── */
     /* Horizontal at 21mm from top */
-    linear-gradient(oklch(1 0 0 / 10%), oklch(1 0 0 / 10%)) 0 21mm / 100% 2px no-repeat,
-    /* Horizontal at 21mm from bottom */
-    linear-gradient(oklch(1 0 0 / 10%), oklch(1 0 0 / 10%)) 0 calc(100% - 19mm) / 100% 2px no-repeat,
+    linear-gradient(oklch(1 0 0 / 10%), oklch(1 0 0 / 10%)) 0 21mm / 100% 1px no-repeat,
+    /* Horizontal at 276mm from top (297mm - 21mm) */
+    linear-gradient(oklch(1 0 0 / 10%), oklch(1 0 0 / 10%)) 0 276mm / 100% 1px no-repeat,
     /* Vertical at 16mm from left */
-    linear-gradient(oklch(1 0 0 / 10%), oklch(1 0 0 / 10%)) 16mm 0 / 2px 100% no-repeat,
-    /* Vertical at 16mm from right */
-    linear-gradient(oklch(1 0 0 / 10%), oklch(1 0 0 / 10%)) calc(100% - 14mm) 0 / 2px 100% no-repeat,
-    /* ── Corner crosses — use same 2px size as guides so calc(100%) aligns ── */
+    linear-gradient(oklch(1 0 0 / 10%), oklch(1 0 0 / 10%)) 16mm 0 / 1px 100% no-repeat,
+    /* Vertical at 194mm from left (210mm - 16mm) */
+    linear-gradient(oklch(1 0 0 / 10%), oklch(1 0 0 / 10%)) 194mm 0 / 1px 100% no-repeat,
+    /* ── Corner crosses (Vercel-style: 8mm arms, 1px thick) ── */
     /* Top-left ┼ */
-    linear-gradient(oklch(0.985 0 0 / 30%), oklch(0.985 0 0 / 30%)) 14mm 21mm / 4mm 2px no-repeat,
-    linear-gradient(oklch(0.985 0 0 / 30%), oklch(0.985 0 0 / 30%)) 16mm 19mm / 2px 4mm no-repeat,
+    linear-gradient(oklch(1 0 0 / 20%), oklch(1 0 0 / 20%)) 12mm 21mm / 8mm 1px no-repeat,
+    linear-gradient(oklch(1 0 0 / 20%), oklch(1 0 0 / 20%)) 16mm 17mm / 1px 8mm no-repeat,
     /* Top-right ┼ */
-    linear-gradient(oklch(0.985 0 0 / 30%), oklch(0.985 0 0 / 30%)) calc(100% - 14mm) 21mm / 4mm 2px no-repeat,
-    linear-gradient(oklch(0.985 0 0 / 30%), oklch(0.985 0 0 / 30%)) calc(100% - 16mm) 19mm / 2px 4mm no-repeat,
+    linear-gradient(oklch(1 0 0 / 20%), oklch(1 0 0 / 20%)) 190mm 21mm / 8mm 1px no-repeat,
+    linear-gradient(oklch(1 0 0 / 20%), oklch(1 0 0 / 20%)) 194mm 17mm / 1px 8mm no-repeat,
     /* Bottom-left ┼ */
-    linear-gradient(oklch(0.985 0 0 / 30%), oklch(0.985 0 0 / 30%)) 14mm calc(100% - 21mm) / 4mm 2px no-repeat,
-    linear-gradient(oklch(0.985 0 0 / 30%), oklch(0.985 0 0 / 30%)) 16mm calc(100% - 19mm) / 2px 4mm no-repeat,
+    linear-gradient(oklch(1 0 0 / 20%), oklch(1 0 0 / 20%)) 12mm 276mm / 8mm 1px no-repeat,
+    linear-gradient(oklch(1 0 0 / 20%), oklch(1 0 0 / 20%)) 16mm 272mm / 1px 8mm no-repeat,
     /* Bottom-right ┼ */
-    linear-gradient(oklch(0.985 0 0 / 30%), oklch(0.985 0 0 / 30%)) calc(100% - 14mm) calc(100% - 21mm) / 4mm 2px no-repeat,
-    linear-gradient(oklch(0.985 0 0 / 30%), oklch(0.985 0 0 / 30%)) calc(100% - 16mm) calc(100% - 19mm) / 2px 4mm no-repeat,
+    linear-gradient(oklch(1 0 0 / 20%), oklch(1 0 0 / 20%)) 190mm 276mm / 8mm 1px no-repeat,
+    linear-gradient(oklch(1 0 0 / 20%), oklch(1 0 0 / 20%)) 194mm 272mm / 1px 8mm no-repeat,
     /* Base background */
     #0a0a0a;
   -webkit-font-smoothing: antialiased;
@@ -249,7 +250,78 @@
   font-size: 10px;
 }
 
+/* ── Header (PDF only — preview uses a React overlay) ── */
+.neu-header {
+  position: absolute;
+  top: 8mm;
+  left: 16mm;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 12pt;
+  color: oklch(1 0 0 / 30%);
+  padding-left: 10pt;
+  pointer-events: none;
+}
+
+/* ── Page numbers (PDF only — preview uses a React overlay) ── */
+.neu-page-number {
+  position: absolute;
+  bottom: 8mm;
+  right: 16mm;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 12pt;
+  color: oklch(1 0 0 / 30%);
+  padding-right: 10pt;
+  pointer-events: none;
+}
+
 /* ── KaTeX dark ── */
 .neu-document .katex {
   color: oklch(0.985 0 0);                              /* foreground */
 }
+
+/* ── Syntax highlighting (highlight.js tokens) ── */
+.neu-document pre code.hljs {
+  color: #ffffff;
+  background: none;
+}
+
+.neu-document .hljs-keyword,
+.neu-document .hljs-selector-tag,
+.neu-document .hljs-built_in { color: #a7a7a7; }
+
+.neu-document .hljs-string,
+.neu-document .hljs-string .hljs-subst { color: #a7a7a7; }
+
+.neu-document .hljs-comment,
+.neu-document .hljs-doctag { color: #666666; }
+
+.neu-document .hljs-number,
+.neu-document .hljs-literal { color: #ffffff; }
+
+.neu-document .hljs-function .hljs-title,
+.neu-document .hljs-title.function_,
+.neu-document .hljs-title.class_ { color: #ffffff; }
+
+.neu-document .hljs-params { color: #a7a7a7; }
+
+.neu-document .hljs-property,
+.neu-document .hljs-attr { color: #a7a7a7; }
+
+.neu-document .hljs-punctuation { color: #a7a7a7; }
+
+.neu-document .hljs-regexp,
+.neu-document .hljs-string-expression { color: #a7a7a7; }
+
+.neu-document .hljs-link { color: #a7a7a7; }
+
+.neu-document .hljs-addition { color: #a7a7a7; }
+.neu-document .hljs-deletion { color: #a7a7a7; }
+
+.neu-document .hljs-variable,
+.neu-document .hljs-template-variable { color: #a7a7a7; }
+
+.neu-document .hljs-type,
+.neu-document .hljs-constant { color: #a7a7a7; }
+
+.neu-document .hljs-symbol { color: #ffffff; }
+.neu-document .hljs-meta { color: #666666; }

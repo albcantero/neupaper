@@ -1,13 +1,16 @@
+import { Nav } from "@/components/landing/Nav";
 import { Hero } from "@/components/landing/Hero";
 import { Features } from "@/components/landing/Features";
 import { Bento } from "@/components/landing/Bento";
 import { Footer } from "@/components/landing/Footer";
 import { SectionIntro } from "@/components/landing/SectionIntro";
-import { HBorder, VBordersFade } from "@/components/landing/SectionBorder";
+import { HBorder, VBordersFade, VBordersFadeFooter } from "@/components/landing/SectionBorder";
 
 export default function Home() {
   return (
-    <div className="min-h-full overflow-y-auto relative font-[family-name:var(--font-display)]">
+    <div className="min-h-full relative font-[family-name:var(--font-display)]">
+      <Nav />
+      <div className="h-14" />
       <VBordersFade>
         <Hero />
       </VBordersFade>
@@ -23,9 +26,9 @@ export default function Home() {
       <Bento />
       <HBorder />
 
-      <VBordersFade>
+      <VBordersFadeFooter>
         <Footer />
-      </VBordersFade>
+      </VBordersFadeFooter>
     </div>
   );
 }

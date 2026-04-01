@@ -46,7 +46,7 @@ function smartSplit(line: string): string[] {
       while (i < line.length && line[i] !== ",") i++;
       i++; // skip comma
     } else {
-      // Unquoted — read until comma, take first word only
+      // Unquoted — read until comma, trim whitespace
       const start = i;
       while (i < line.length && line[i] !== ",") i++;
       const raw = line.slice(start, i).trim();

@@ -18,7 +18,7 @@
 <summary><strong>Neupaper vs Notion</strong></summary>
 
 <p align=center>
-	<img src="x" width="800" alt="PDF exports Notion vs Neupaper"/>
+	<img src="https://raw.githubusercontent.com/albcantero/neupaper/main/public/github/screenshot%20(1).png" width="800" alt="PDF exports Notion vs Neupaper"/>
 </p>
 
 </details>
@@ -48,7 +48,7 @@ El editor incluye syntax highlighting custom para la sintaxis de Markdown Isles,
 ### 📸 Capturas de pantalla o GIFs
 
 <p align=center>
-	<img src="x" width="800" alt="Newpaper editor screenshot"/>
+	<img src="https://raw.githubusercontent.com/albcantero/neupaper/main/public/github/screenshot%20(2).png" width="800" alt="Neupaper editor screenshot"/>
 </p>
 
 ### ☁️ ¿Cómo has utilizado CubePath?

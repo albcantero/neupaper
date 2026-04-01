@@ -62,7 +62,7 @@ export default function VaultPage() {
                 <div className="flex-1 min-h-0 overflow-hidden pb-2" style={{ backgroundColor: NEU_EDITOR_BG }}>
                   <Editor
                     key={vault.activeFile.id}
-                    content={vault.activeFile.content}
+                    content={vault.liveContent}
                     onChange={vault.changeContent}
                     fontFamily={EDITOR_FONTS.find((f) => f.id === settings.font)?.family}
                     fontSize={settings.fontSize}
@@ -84,7 +84,7 @@ export default function VaultPage() {
             <ResizablePanel defaultSize={50} minSize={20}>
               <div className={`h-full pt-2 pb-2 pr-2 transition-all duration-200 ${handleHovered ? "pl-3" : "pl-1"}`}>
                 <Card className="flex flex-col gap-0 py-0 h-full overflow-hidden">
-                  <Preview content={vault.liveContent} components={vault.components} dataFiles={vault.dataFiles} />
+                  <Preview content={vault.liveContent} components={vault.components} dataFiles={vault.dataFiles} onContentChange={vault.changeContent} />
                 </Card>
               </div>
             </ResizablePanel>

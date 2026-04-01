@@ -1,0 +1,325 @@
+/* ── Neupaper document theme — dark minimal (Vercel/Linear) ── */
+/* Colors from Shadcn dark palette (neutral hue 0°) */
+
+.modernist {
+  position: relative;
+  min-height: 297mm;
+  padding: 25mm 20mm;
+  font-family: "Writer", monospace;
+  font-size: 9pt;
+  letter-spacing: -0.05em;
+  line-height: 1.25;
+  color: #666666;
+  background: #f9f9f9;
+  -webkit-font-smoothing: antialiased;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* ── Section layout ── */
+.modernist .me-full {
+  width: 100%;
+}
+
+.modernist .me-section {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  column-gap: 1.5em;
+}
+
+.modernist .me-heading {
+  align-self: start;
+}
+
+.modernist .me-content {
+  min-width: 0;
+}
+
+
+.modernist h1 {
+  font-family: "Satoshi", sans-serif;
+  font-size: 40pt;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: #161616;                              /* foreground */
+  margin: 0 0 0.5em;
+}
+
+.modernist h1::before {
+  content: "";
+  display: block;
+  width: 4.25em;
+  height: 1.85em;
+  background: url("/shape-1.svg") no-repeat left center / contain, url("/shape-2.svg") no-repeat right center / contain;
+}
+
+.modernist h2,
+.modernist h3,
+.modernist h4 {
+  font-family: "Satoshi", sans-serif;
+}
+
+.modernist h2 {
+  font-size: 22pt;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #161616;                              /* foreground */
+  margin: 0;
+  line-height: 1.2;
+}
+
+.modernist h3 {
+  font-size: 18pt;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #161616;                              /* foreground */
+  margin: 0;
+  line-height: 1.3;
+}
+
+.modernist h4 {
+  font-size: 13pt;
+  font-weight: 500;
+  color: #161616;                              /* foreground */
+  margin: 0;
+  line-height: 1.3;
+}
+
+.modernist p {
+  margin: 0 0 0.85em;
+}
+
+.modernist strong {
+  font-weight: 500;
+  color: #161616;                              /* foreground */
+}
+
+.modernist em {
+  color: #161616;                              /* foreground */
+}
+
+.modernist a {
+  color: #3b5bdb;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgb(59 91 219 / 30%);
+}
+
+.modernist ul {
+  margin: 0 0 0.85em;
+  padding-left: 2.5em;
+  list-style-type: disc;
+}
+
+.modernist ol {
+  margin: 0 0 0.85em;
+  padding-left: 2.5em;
+  list-style-type: decimal;
+}
+
+.modernist li {
+  margin: 0.25em 0;
+}
+
+.modernist ol li::marker {
+  font-family: var(--font-geist-mono), monospace;
+}
+
+.modernist li > ul,
+.modernist li > ol {
+  margin: 0.25em 0 0;
+}
+
+.modernist blockquote {
+  margin: 0 0 0.85em;
+  padding: 0.4em 0 0.4em 1em;
+  border-left: 2px solid #e0e0e0;
+  color: #666666;
+}
+
+.modernist code {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.88em;
+  background: transparent;
+  color: #161616;                              /* foreground */
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  border: 1px solid #666666;
+}
+
+.modernist pre {
+  margin: 0 0 0.85em;
+  padding: 0.85em 1.1em;
+  background: transparent;
+  border: 1px solid #666666;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+.modernist pre code {
+  background: none;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  font-size: 0.85em;
+}
+
+.modernist hr {
+  margin: 1.8em 0;
+  border: none;
+  border-top: 1px solid transparent;
+}
+
+.modernist table {
+  width: 100%;
+  margin: 0 0 0.85em;
+  border-collapse: collapse;
+  font-size: 10pt;
+  border: 1px solid #666666;
+}
+
+.modernist th {
+  font-weight: 500;
+  font-size: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+  padding: 0.3em 0.5em;
+  color: #161616;
+  border: 1px solid #666666;
+  background: rgb(102 102 102 / 20%);
+}
+
+.modernist td {
+  padding: 0.3em 0.5em;
+  border: 1px solid #666666;
+  color: #666666;
+}
+
+.modernist td strong {
+  color: #161616;                              /* foreground */
+}
+
+.modernist h5 {
+  font-size: 12pt;
+  font-weight: 500;
+  line-height: 1.3;
+  color: #161616;                              /* foreground */
+  margin: 0;
+}
+
+.modernist h6 {
+  font-size: 11pt;
+  font-weight: 500;
+  line-height: 1.3;
+  color: #161616;                              /* foreground */
+  margin: 0;
+}
+
+.modernist del {
+  text-decoration: line-through;
+  color: #999999;
+}
+
+.modernist mark {
+  background: rgb(59 91 219 / 20%);
+  color: #161616;                              /* foreground */
+  padding: 0.1em 0.2em;
+  border-radius: 2px;
+}
+
+.modernist li:has(> input[type="checkbox"]) {
+  list-style-type: none;
+  margin-left: -1.5em;
+}
+
+.modernist img {
+  max-width: 100%;
+  height: auto;
+}
+
+.modernist input[type="checkbox"] {
+  margin-right: 0.4em;
+}
+
+/* ── Explicit page break ── */
+.modernist .neu-pagebreak {
+  break-before: page;
+  display: block;
+  height: 0;
+  border-top: 1px dashed #e0e0e0;
+  margin: 1.5em 0;
+}
+
+/* ── Mermaid Gantt — rotate dense x-axis date labels ── */
+.modernist svg[aria-roledescription="gantt"] .tick text {
+  transform: rotate(-45deg) translate(-40px, 0px);
+  text-anchor: end;
+  font-size: 10px;
+}
+
+/* ── Header (PDF only — preview uses a React overlay) ── */
+.neu-header {
+  position: absolute;
+  top: 8mm;
+  left: 16mm;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 12pt;
+  color: rgb(255 255 255 / 30%);
+  padding-left: 10pt;
+  pointer-events: none;
+}
+
+.modernist .neu-header {
+  color: #666666;
+  font-family: "Satoshi", sans-serif;
+  font-size: 9pt;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  left: auto;
+  right: 16mm;
+  gap: 4pt;
+  border: 1px solid #666666;
+  border-radius: 100px;
+  padding: 0.2em 0.8em;
+  width: fit-content;
+}
+
+.modernist .neu-header::before {
+  content: "";
+  order: -1;
+  width: 11pt;
+  height: 11pt;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 705 591'%3E%3Cpath fill='%23666666' d='M647.1 278.8v32.4C400.2 383.3 373.5 530.2 373.5 590h-33.7c0-59 22.3-193 208.2-278.2H58.3v-33.7h489.8C362.1 193 339.8 59 339.8 0h33.7c0 59.8 26.7 206.7 273.6 278.8z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+
+/* ── Page numbers (PDF only — preview uses a React overlay) ── */
+.neu-page-number {
+  position: absolute;
+  bottom: 8mm;
+  right: 16mm;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 12pt;
+  color: rgb(255 255 255 / 30%);
+  padding-right: 10pt;
+  pointer-events: none;
+}
+
+.modernist .neu-page-number {
+  color: #666666;
+  font-family: "Satoshi", sans-serif;
+  font-size: 24pt;
+  font-weight: 300;
+  right: auto;
+  left: 16mm;
+  padding-right: 0;
+  padding-left: 10pt;
+}
+
+/* ── KaTeX dark ── */
+.modernist .katex {
+  color: #161616;                              /* foreground */
+}

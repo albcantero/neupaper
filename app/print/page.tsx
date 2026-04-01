@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "@/app/vault/themes/neu-document.css";
+import "@/app/vault/themes/modernist.css";
 
 export const metadata: Metadata = {
   robots: "noindex",
@@ -17,17 +18,17 @@ export default function PrintPage() {
           padding: 0 !important;
           display: block !important;
         }
-        article.neu-document {
-          min-height: 297mm;
-          -webkit-box-decoration-break: clone;
-          box-decoration-break: clone;
+        article.neu-print {
+          margin: 0;
+          padding: 0;
         }
-        .neu-pagebreak {
-          border: none !important;
-          margin: 0 !important;
+        .neu-page {
+          width: 210mm;
+          height: 297mm;
+          overflow: hidden;
         }
       `}</style>
-      <article className="neu-document" />
+      <article className="neu-print" />
     </>
   );
 }

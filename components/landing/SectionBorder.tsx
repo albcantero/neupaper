@@ -28,3 +28,16 @@ export function VBordersFade({ children }: { children: React.ReactNode }) {
     </div>
   )
 }
+
+const vFadeGradientFooter = "linear-gradient(to bottom, var(--background) 0px, var(--border) 48px, var(--input) 38%, oklch(from var(--ring) l c h / 50%) 50%, var(--input) 62%, var(--border) calc(100% - 24px), var(--background) 100%)"
+
+/** Vertical lines with fade — shorter extension for footer */
+export function VBordersFadeFooter({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="relative max-w-5xl mx-auto overflow-visible">
+      {children}
+      <div className="absolute -top-12 -bottom-4 left-0 w-px" style={{ background: vFadeGradientFooter }} />
+      <div className="absolute -top-12 -bottom-4 right-0 w-px" style={{ background: vFadeGradientFooter }} />
+    </div>
+  )
+}

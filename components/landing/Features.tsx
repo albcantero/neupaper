@@ -1,7 +1,7 @@
 "use client";
 
 import { Lora, Geist, Nunito, EB_Garamond, IBM_Plex_Mono } from "next/font/google";
-import { IconFileText, IconBrain, IconCheck, IconTypography } from "@tabler/icons-react";
+import { IconCashHeart, IconBrain, IconCheck, IconTypography } from "@tabler/icons-react";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -102,11 +102,11 @@ export function Features() {
   }, [nameIndex]);
 
   return (
-    <section className="max-w-5xl mx-auto px-8 bg-card">
+    <section id="features" className="max-w-5xl mx-auto px-8 bg-card">
       <div className="flex flex-col md:flex-row">
         <div className="flex-1 flex flex-col gap-4 pt-10 md:pr-12">
-          <Badge variant="outline" className="w-fit gap-1.5 font-normal text-accent">
-            <IconFileText className="size-3" />
+          <Badge variant="outline" className="w-fit gap-1.5 font-normal text-accent-display border-accent-display">
+            <IconCashHeart className="size-3" />
             Beautiful output from Markdown
           </Badge>
           <h2 className="text-2xl font-semibold">Meet Neupaper. <span className="text-muted-foreground">A minimalist open-source text editor.</span></h2>
@@ -148,7 +148,7 @@ export function Features() {
         </div>
         <div className="hidden md:block w-px bg-input" />
         <div className="flex-1 flex flex-col gap-4 pt-10 md:pl-12">
-          <Badge variant="outline" className="w-fit gap-1.5 font-normal">
+          <Badge variant="outline" className="w-fit gap-1.5 font-normal text-accent-display border-accent-display">
             <IconBrain className="size-3" />
             Dynamic documents that think
           </Badge>

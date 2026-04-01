@@ -113,7 +113,11 @@ export function useVaultFiles() {
   const newFolderIn = useCallback((parentPath: string): string => {
     const ext = parentPath.startsWith("components") ? ".isle" : ".data";
     const newFolderPath = parentPath ? `${parentPath}/new-folder` : "new-folder";
-    createVaultFile(`${newFolderPath}/untitled${ext}`);
+    const baseName = ext === ".isle" ? "NewComponent" : "untitled";
+    const defaultContent = ext === ".isle"
+      ? `\${ create <${baseName}> }\n\n\${ end <${baseName}> }`
+      : `\${ data }\n\n\${ end data }`;
+    createVaultFile(`${newFolderPath}/${baseName}${ext}`, defaultContent);
     refresh();
     return newFolderPath;
   }, [refresh]);
@@ -139,10 +143,22 @@ export function useVaultFiles() {
   const newInFolder = useCallback((folderPath: string) => {
     const isComponents = folderPath.startsWith("components");
     const ext = isComponents ? ".isle" : ".data";
-    const file = createVaultFile(`${folderPath}/untitled${ext}`);
+    const baseName = ext === ".isle" ? "NewComponent" : "untitled";
+    const existingNames = new Set(allFiles.map((f) => f.name));
+    let name = `${baseName}${ext}`;
+    let i = 1;
+    while (existingNames.has(name)) {
+      name = `${baseName}-${i}${ext}`;
+      i++;
+    }
+    const componentName = name.replace(ext, "");
+    const defaultContent = ext === ".isle"
+      ? `\${ create <${componentName}> }\n\n\${ end <${componentName}> }`
+      : `\${ data }\n\n\${ end data }`;
+    const file = createVaultFile(`${folderPath}/${name}`, defaultContent);
     refresh();
     select(file.id);
-  }, [refresh, select]);
+  }, [refresh, select, allFiles]);
 
   const createVaultFileAction = useCallback((path: string) => {
     const file = createVaultFile(path);

@@ -91,6 +91,11 @@ function resolveList(path: string, ctx: DataObject, locals: DataObject): DataVal
 
 // ─── Core evaluator ───────────────────────────────────────────────
 
+/**
+ * Evaluate an AST into a Markdown string.
+ * WARNING: Mutates `ctx` (data/load/set merge into it).
+ * Callers should pass a cloned context if the original must be preserved.
+ */
 export function evaluate(
   nodes: ASTNode[],
   ctx: DataObject,

@@ -136,6 +136,7 @@
 @import "shadcn/tailwind.css";
 
 @import "./vault/themes/neu-document.css";
+@import "./vault/themes/modernist.css";
 
 @custom-variant dark (&:is(.dark *));
 
