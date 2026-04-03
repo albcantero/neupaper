@@ -27,9 +27,9 @@ function collectConfig(nodes: ASTNode[]): Record<string, string> {
 /**
  * Parse a Markdown Isles source string and return clean Markdown.
  *
- * ${ document } is required — only content inside it is rendered.
- * Everything outside (config, load, import, data) is processed for
- * side effects only. No ${ document } = empty output.
+ * All content is rendered except setup blocks (config, load, import,
+ * data, create). If `${ document }` / `${ end document }` is present
+ * it is silently ignored (backwards compatible) but not required.
  */
 export function parse(
   source: string,
@@ -42,13 +42,8 @@ export function parse(
   const evalCtx = structuredClone(ctx);
   const imports = collectImports(ast);
 
-  // Evaluate non-document nodes for side effects (data, load, set)
-  const preamble = ast.filter((n) => n.type !== "document");
-  evaluate(preamble, evalCtx, {}, dataFiles);
-
-  // Only render content inside ${ document } — no document = empty output
-  const docNode = ast.find((n) => n.type === "document");
-  let result = docNode ? evaluate([docNode], evalCtx, {}, dataFiles) : "";
+  // Evaluate the full AST — all content is renderable
+  let result = evaluate(ast, evalCtx, {}, dataFiles);
 
   // Only pass imported components to the resolver
   const allowedComponents: Record<string, string> = {};
@@ -77,11 +72,8 @@ export function parseWithConfig(
   const imports = collectImports(ast);
   const config  = collectConfig(ast);
 
-  const preamble = ast.filter((n) => n.type !== "document");
-  evaluate(preamble, evalCtx, {}, dataFiles);
-
-  const docNode = ast.find((n) => n.type === "document");
-  let result = docNode ? evaluate([docNode], evalCtx, {}, dataFiles) : "";
+  // Evaluate the full AST — all content is renderable
+  let result = evaluate(ast, evalCtx, {}, dataFiles);
 
   const allowedComponents: Record<string, string> = {};
   for (const name of imports) {

@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { parse } from "../index";
 
-/** Wraps content in ${ document } ... ${ end document } */
-const d = (s: string) => `\${ document }\n${s}\n\${ end document }`;
-/** Wraps preamble + document content */
-const pd = (preamble: string, content: string) => `${preamble}\n\${ document }\n${content}\n\${ end document }`;
+/** Previously wrapped content in ${ document }; now passes through directly */
+const d = (s: string) => s;
+/** Wraps preamble + content (no document wrapper needed) */
+const pd = (preamble: string, content: string) => `${preamble}\n${content}`;
 
 describe("variables", () => {
   it("sustituye una variable simple", () => {
@@ -217,31 +217,38 @@ describe("ctx no se muta", () => {
   });
 });
 
-describe("document — delimita contenido renderizable", () => {
-  it("solo renderiza lo que está dentro de document", () => {
+describe("document wrapper — no longer required", () => {
+  it("renders content without document wrapper", () => {
     const src = [
-      "Esto no se ve",
+      "${ data }",
+      "nombre = Alberto",
+      "${ end data }",
+      "Hola ${ @nombre }",
+    ].join("\n");
+    const out = parse(src);
+    expect(out).toContain("Hola Alberto");
+  });
+
+  it("sin document, renderiza todo el contenido", () => {
+    const src = "Hola ${ @nombre }";
+    const out = parse(src, { nombre: "Ana" });
+    expect(out).toContain("Hola Ana");
+  });
+
+  it("document wrapper is silently ignored (backwards compatible)", () => {
+    const src = [
       "${ data }",
       "nombre = Alberto",
       "${ end data }",
       "${ document }",
       "Hola ${ @nombre }",
       "${ end document }",
-      "Esto tampoco se ve",
     ].join("\n");
     const out = parse(src);
     expect(out).toContain("Hola Alberto");
-    expect(out).not.toContain("Esto no se ve");
-    expect(out).not.toContain("Esto tampoco se ve");
   });
 
-  it("sin document, no renderiza nada", () => {
-    const src = "Hola ${ @nombre }";
-    const out = parse(src, { nombre: "Ana" });
-    expect(out).toBe("");
-  });
-
-  it("data y load fuera de document se procesan pero no se emiten", () => {
+  it("data y load se procesan y no se emiten", () => {
     const dataFiles = { "test.data": "x = 42" };
     const src = pd("${ load test.data }", "Valor: ${ @x }");
     const out = parse(src, {}, {}, dataFiles);

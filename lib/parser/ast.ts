@@ -156,14 +156,11 @@ export function buildAST(tokens: Token[]): ASTNode[] {
       continue;
     }
 
-    // ── Document (delimits renderable content) ───────────────────
+    // ── Document (silently ignored — backwards compatible) ────────
     if (body === "document") {
-      const node: Extract<ASTNode, { type: "document" }> = {
-        type: "document",
-        children: [],
-      };
-      current().push(node);
-      frames.push({ kind: "document", children: node.children });
+      // No-op: ${ document } is no longer required.
+      // We still track it on the stack so ${ end document } can pop it.
+      frames.push({ kind: "document", children: current() });
       continue;
     }
 
@@ -280,9 +277,9 @@ export function buildAST(tokens: Token[]): ASTNode[] {
     if (body === "end" || body.startsWith("end ")) {
       if (frames.length > 1) {
         const topKind = frames[frames.length - 1].kind;
-        // Generic ${ end } can't close component or document frames
-        if (body === "end" && (topKind === "component" || topKind === "document")) {
-          // ignore — need ${ close <X> } or ${ end document }
+        // Generic ${ end } can't close component frames
+        if (body === "end" && topKind === "component") {
+          // ignore — need ${ close <X> }
         } else if (topKind !== "component") {
           frames.pop();
         }

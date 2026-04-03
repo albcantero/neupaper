@@ -47,3 +47,4 @@ case_studies/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+MARKETING.md

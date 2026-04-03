@@ -1,5 +1,6 @@
 import { Nav } from "@/components/landing/Nav";
 import { Hero } from "@/components/landing/Hero";
+import { TabPreview } from "@/components/landing/TabPreview";
 import { Features } from "@/components/landing/Features";
 import { Bento } from "@/components/landing/Bento";
 import { Footer } from "@/components/landing/Footer";
@@ -15,6 +16,8 @@ export default function Home() {
         <Hero />
       </VBordersFade>
 
+      <TabPreview />
+
       <SectionIntro />
 
       <HBorder />
@@ -22,7 +25,7 @@ export default function Home() {
           <Features />
         </VBordersFade>
       <HBorder />
-      
+
       <Bento />
       <HBorder />
 

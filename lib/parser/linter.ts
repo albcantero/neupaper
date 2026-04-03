@@ -148,6 +148,7 @@ function passStructural(
       continue;
     }
     if (body === "data") { stack.push({ kind: "data", from, to }); continue; }
+    // ${ document } is silently ignored — no longer required
     if (body === "document") { stack.push({ kind: "document", from, to }); continue; }
 
     // ${ get propName }
@@ -218,8 +219,9 @@ function passStructural(
     }
   }
 
-  // Anything left open
+  // Anything left open (document is silently ignored — no longer required)
   for (const entry of stack) {
+    if (entry.kind === "document") continue;
     diagnostics.push({ from: entry.from, to: entry.to, severity: "error", message: "Bloque ${ " + entry.kind + " } abierto sin ${ end }" });
   }
 

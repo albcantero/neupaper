@@ -132,7 +132,7 @@ describe("linter — open/close", () => {
   });
 });
 
-describe("linter — document", () => {
+describe("linter — document (silently ignored)", () => {
   it("document + end document correcto no da error", () => {
     const src = "${ document }\ncontenido\n${ end document }";
     expect(lint(src).filter((d) => d.severity === "error")).toHaveLength(0);
@@ -141,6 +141,17 @@ describe("linter — document", () => {
   it("end document sin document da error", () => {
     const d = lint("${ end document }");
     expect(d.some((d) => d.severity === "error" && d.message.includes("document"))).toBe(true);
+  });
+
+  it("document without end document does NOT produce error", () => {
+    const src = "${ document }\ncontenido";
+    expect(lint(src).filter((d) => d.severity === "error")).toHaveLength(0);
+  });
+
+  it("content without document wrapper produces no error", () => {
+    const src = "# Title\n${ @variable }\n${ for item in @list }${ item }${ end }";
+    // Only warnings (undefined vars), no structural errors
+    expect(lint(src).filter((d) => d.severity === "error")).toHaveLength(0);
   });
 });
 

@@ -41,7 +41,7 @@ export function createFile(name: string): NeuFile {
     id: crypto.randomUUID(),
     name: fileName,
     path: fileName,
-    content: `\${ config theme="neu-document" page-numbers header="New document" }\n\n\${ data }\n  app = Neupaper\n\${ end data }\n\n\n\n\${ document }\n\n# Title\nHey! I am using **\${ @app }**\n\n\${ end document }`,
+    content: `\${ config theme="neu-document" page-numbers header="New document" }\n\n\${ data }\n  app = Neupaper\n\${ end data }\n\n# Title\nHey! I am using **\${ @app }**`,
     createdAt: Date.now(),
     updatedAt: Date.now(),
   };
@@ -93,14 +93,8 @@ export const DEFAULT_DOCUMENT_CONTENT = `\${ config theme="neu-document" page-nu
   app = Neupaper
 \${ end data }
 
-
-
-\${ document }
-
 # Title
 Hey! I am using **\${ @app }**
-
-\${ end document }
 `;
 
 export const EXAMPLE_TERMS_ISLE = `\${ create <Terms> props() }
@@ -130,8 +124,6 @@ export const EXAMPLE_PROJECT_PROPOSAL = `\${ config theme="modernist" page-numbe
 \${ end data }
 
 \${ import <Terms> }
-
-\${ document }
 
 # \${ @project.name }
 
@@ -189,13 +181,9 @@ The final two phases cover end-to-end testing under production-like load, follow
 ### Terms
 
 \${ <Terms> }
-
-\${ end document }
 `;
 
 export const EXAMPLE_ISSUE_REVIEW = `\${ config theme="neu-document" }
-
-\${ document }
 
 # Issue Review — Auth middleware timeout
 
@@ -228,15 +216,11 @@ Cache the JWKS response with a 1-hour TTL. This reduces external calls from ~12k
 - [ ] Implement JWKS cache with TTL
 - [ ] Add circuit breaker for JWKS endpoint
 - [ ] Monitor p99 latency after deploy
-
-\${ end document }
 `;
 
 export const EXAMPLE_CLIENT_REPORT = `\${ config theme="neu-document" page-numbers header="Client report" }
 
 \${ load clients (example).data }
-
-\${ document }
 
 # Client Report — \${ @company.name }
 
@@ -263,8 +247,6 @@ export const EXAMPLE_CLIENT_REPORT = `\${ config theme="neu-document" page-numbe
   - **\${ client.name }** — free tier, no revenue yet.
   \${ end }
 \${ end }
-
-\${ end document }
 `;
 
 export const EXAMPLE_CLIENTS_DATA = `\${ data }
@@ -310,16 +292,16 @@ export function initVault(): string | null {
     };
     const exampleDoc: NeuFile = {
       id: crypto.randomUUID(),
-      name: "client-report (example).neu",
-      path: "client-report (example).neu",
+      name: "client-report (example).md",
+      path: "client-report (example).md",
       content: EXAMPLE_CLIENT_REPORT,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
     const proposalDoc: NeuFile = {
       id: crypto.randomUUID(),
-      name: "project-proposal (example).neu",
-      path: "project-proposal (example).neu",
+      name: "project-proposal (example).md",
+      path: "project-proposal (example).md",
       content: EXAMPLE_PROJECT_PROPOSAL,
       createdAt: Date.now(),
       updatedAt: Date.now(),

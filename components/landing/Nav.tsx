@@ -12,7 +12,7 @@ export function Nav() {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 mx-auto w-full max-w-5xl border-transparent border-b md:rounded-md md:border md:transition-all md:ease-out",
+        "fixed top-0 left-0 right-0 z-50 mx-auto w-full max-w-[1250px] border-transparent border-b md:rounded-md md:border md:transition-all md:ease-out",
         {
           "border-border bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/50 md:top-2 md:max-w-4xl md:shadow":
             scrolled,
@@ -38,7 +38,7 @@ export function Nav() {
             </span>
           </Button>
           <Button asChild size="sm" variant="ghost">
-            <Link href="https://github.com/user/neupaper" className="font-mono-display uppercase text-sm tracking-tight">
+            <Link href="https://github.com/albcantero/neupaper" className="font-mono-display uppercase text-sm tracking-tight">
               GitHub
             </Link>
           </Button>

@@ -36,8 +36,8 @@ function CardCarousel({ tick }: { tick: number }) {
 
   return (
     <div className="relative flex flex-col items-center h-32 w-full overflow-hidden">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-background to-transparent z-10" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-background to-transparent z-10" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-card to-transparent z-10" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-card to-transparent z-10" />
       <AnimatePresence initial={false}>
         {visible.map((item, i) => (
           <motion.div
@@ -102,7 +102,7 @@ export function Features() {
   }, [nameIndex]);
 
   return (
-    <section id="features" className="max-w-5xl mx-auto px-8 bg-card">
+    <section id="features" className="max-w-[1250px] mx-auto px-8 bg-card">
       <div className="flex flex-col md:flex-row">
         <div className="flex-1 flex flex-col gap-4 pt-10 md:pr-12">
           <Badge variant="outline" className="w-fit gap-1.5 font-normal text-accent-display border-accent-display">

@@ -2,7 +2,7 @@ import { IconFileExport, IconMathFunction, IconChartDots, IconGitBranch } from "
 
 export function Bento() {
   return (
-    <section id="bento" className="max-w-5xl mx-auto px-8 py-24">
+    <section id="bento" className="max-w-[1250px] mx-auto px-8 py-24">
       <div className="grid grid-cols-3 grid-rows-2 gap-4 h-[420px]">
 
         {/* Bento 1 — large, top-left (col-span-2) */}

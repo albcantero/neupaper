@@ -4,12 +4,12 @@ const navLinks = [
   { href: "/vault", label: "Open Vault" },
   { href: "#features", label: "Features" },
   { href: "#bento", label: "Overview" },
-  { href: "https://github.com/user/neupaper", label: "GitHub" },
+  { href: "https://github.com/albcantero/neupaper", label: "GitHub" },
 ];
 
 export function Footer() {
   return (
-    <footer className="mx-auto max-w-5xl *:px-8">
+    <footer className="mx-auto max-w-[1250px] *:px-8">
       <div className="flex flex-col gap-4 py-2">
         <div className="flex items-center justify-between">
           <Link href="/">

@@ -10,7 +10,7 @@ export function HBorder() {
 /** Solid vertical lines — no fade */
 export function VBorders({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative max-w-5xl mx-auto">
+    <div className="relative max-w-[1250px] mx-auto">
       {children}
       <div className="absolute top-0 bottom-0 left-0 w-px" style={{ background: "linear-gradient(to bottom, var(--border), var(--input) 38%, oklch(from var(--ring) l c h / 50%) 50%, var(--input) 62%, var(--border))" }} />
       <div className="absolute top-0 bottom-0 right-0 w-px" style={{ background: "linear-gradient(to bottom, var(--border), var(--input) 38%, oklch(from var(--ring) l c h / 50%) 50%, var(--input) 62%, var(--border))" }} />
@@ -21,7 +21,7 @@ export function VBorders({ children }: { children: React.ReactNode }) {
 /** Vertical lines with fade — extend 48px above/below the section */
 export function VBordersFade({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative max-w-5xl mx-auto overflow-visible">
+    <div className="relative max-w-[1250px] mx-auto overflow-visible">
       {children}
       <div className="absolute -top-24 -bottom-24 left-0 w-px" style={{ background: vFadeGradient }} />
       <div className="absolute -top-24 -bottom-24 right-0 w-px" style={{ background: vFadeGradient }} />
@@ -34,7 +34,7 @@ const vFadeGradientFooter = "linear-gradient(to bottom, var(--background) 0px, v
 /** Vertical lines with fade — shorter extension for footer */
 export function VBordersFadeFooter({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative max-w-5xl mx-auto overflow-visible">
+    <div className="relative max-w-[1250px] mx-auto overflow-visible">
       {children}
       <div className="absolute -top-12 -bottom-4 left-0 w-px" style={{ background: vFadeGradientFooter }} />
       <div className="absolute -top-12 -bottom-4 right-0 w-px" style={{ background: vFadeGradientFooter }} />
