@@ -1,6 +1,14 @@
 @import "tailwindcss";
 
 @font-face {
+  font-family: "Jalliya";
+  src: url("/fonts/ui/jalliya.regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: "Open Sauce One";
   src: url("/fonts/ui/open-sauce-one/OpenSauceOneVF.woff2") format("woff2");
   font-weight: 100 900;

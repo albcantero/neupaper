@@ -1,4 +1,4 @@
-const hGradient = "linear-gradient(to right, var(--background) 12%, var(--border) 22%, var(--input) 38%, oklch(from var(--ring) l c h / 50%) 50%, var(--input) 62%, var(--border) 78%, var(--background) 88%)"
+const hGradient = "linear-gradient(to right, var(--background) 8%, var(--border) 18%, var(--input) 36%, oklch(from var(--ring) l c h / 50%) 50%, var(--input) 64%, var(--border) 82%, var(--background) 92%)"
 
 // Fade only in the extended parts (48px above/below), solid throughout the section
 const vFadeGradient = "linear-gradient(to bottom, var(--background) 0px, var(--border) 96px, var(--input) 38%, oklch(from var(--ring) l c h / 50%) 50%, var(--input) 62%, var(--border) calc(100% - 96px), var(--background) 100%)"

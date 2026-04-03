@@ -4,6 +4,7 @@ import { TabPreview } from "@/components/landing/TabPreview";
 import { Features } from "@/components/landing/Features";
 import { Bento } from "@/components/landing/Bento";
 import { Footer } from "@/components/landing/Footer";
+import { Author } from "@/components/landing/Author";
 import { SectionIntro } from "@/components/landing/SectionIntro";
 import { HBorder, VBordersFade, VBordersFadeFooter } from "@/components/landing/SectionBorder";
 
@@ -18,7 +19,11 @@ export default function Home() {
 
       <TabPreview />
 
-      <SectionIntro />
+      <SectionIntro
+        label="// Features"
+        title="Write once, export everywhere"
+        description="A Markdown editor with professional PDF output, dynamic templates, and a canvas that feels like a design tool."
+      />
 
       <HBorder />
         <VBordersFade>
@@ -27,6 +32,13 @@ export default function Home() {
       <HBorder />
 
       <Bento />
+
+      <SectionIntro label="// Author" title="Who is making Neupaper?" />
+
+      <HBorder />
+      <VBordersFade>
+        <Author />
+      </VBordersFade>
       <HBorder />
 
       <VBordersFadeFooter>
