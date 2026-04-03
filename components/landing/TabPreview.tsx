@@ -119,6 +119,9 @@ const tabsData: TabData[] = [
           line(isle("${", delim), isle(" for ", kw), isle("item ", fg7), isle("in ", op), isle("@scope", atVar), isle(" }", delim)),
           line(isle("| ", mt), isle("${", delim), isle(" item.name ", fg7), isle("}", delim), isle(" | ", mt), isle("${", delim), isle(" item.price ", fg7), isle("}", delim), isle(" \u20AC |", mt)),
           line(isle("${", delim), isle(" end ", kw), isle("}", delim)),
+          blank(),
+          line(isle("${", delim), isle(" set ", kw), isle("@total", atVar), isle(" = ", op), isle("sum ", kw), isle("@scope.price", atVar), isle(" }", delim)),
+          line(isle("**Total: ", mt), isle("${", delim), isle(" @total ", atVar), isle("}", delim), isle(" \u20AC**", mt)),
         ],
       },
       {
@@ -630,11 +633,11 @@ function VaultSidebar({
       </div>
 
       {/* Vault section */}
-      <div className="px-3 pt-3 pb-1 flex-1 overflow-y-auto">
-        <span className="text-[9px] font-medium uppercase tracking-wider text-muted-foreground/40">
+      <div className="pt-3 pb-1 flex-1 overflow-y-auto">
+        <span className="text-[9px] font-medium uppercase tracking-wider text-muted-foreground/40 px-3">
           Vault
         </span>
-        <Collapsible defaultOpen className="group/collapsible mt-1.5">
+        <Collapsible defaultOpen className="group/collapsible mt-1.5 px-2">
           <CollapsibleTrigger className="flex items-center gap-1.5 py-0.5 rounded-md text-[11px] text-foreground hover:bg-input/20 w-full transition-colors">
             <span className="size-5 shrink-0 inline-flex items-center justify-center rounded border border-input bg-background text-muted-foreground">
               <IconBolt className="size-3" strokeWidth={1.75} />
@@ -644,7 +647,7 @@ function VaultSidebar({
             <IconMinus className="size-3 text-muted-foreground/60 group-data-[state=closed]/collapsible:hidden" strokeWidth={1.75} />
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <div className="ml-3 pl-2 border-l border-border/40 flex flex-col gap-0.5 mt-0.5">
+            <div className="flex flex-col gap-0.5 mt-0.5">
               {/* Folders */}
               {tab.folders.map((folder) => (
                 <FolderItem

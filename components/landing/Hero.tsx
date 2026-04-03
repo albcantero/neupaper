@@ -15,8 +15,8 @@ export function Hero() {
     <section className="max-w-[1250px] mx-auto relative overflow-clip bg-transparent">
       <HeroGrid />
       <div className="relative flex flex-col items-center justify-center gap-8 px-8 py-44 text-center ">
-        <h1 className="text-7xl font-bold tracking-tight max-w-4xl bg-gradient-to-r from-foreground from-30% to-muted-foreground bg-clip-text text-transparent">
-          Reusable Professional Documents written in Markdown
+        <h1 className="text-6xl font-bold tracking-tight max-w-5xl bg-gradient-to-r from-foreground from-30% to-muted-foreground bg-clip-text text-transparent">
+          Reusable professional documents written in Markdown
         </h1>
         <div className="flex items-center gap-6">
           <Button size="sm" className="rounded-full text-xs font-medium tracking-tight uppercase font-mono-display">
