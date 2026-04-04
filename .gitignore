@@ -48,3 +48,4 @@ case_studies/
 *.tsbuildinfo
 next-env.d.ts
 MARKETING.md
+docs/
