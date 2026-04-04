@@ -4,9 +4,11 @@ import { TabPreview } from "@/components/landing/TabPreview";
 import { Features } from "@/components/landing/Features";
 import { Bento } from "@/components/landing/Bento";
 import { Footer } from "@/components/landing/Footer";
-import { Author } from "@/components/landing/Author";
+// import { Author } from "@/components/landing/Author";
+import { AuthorAlt as Author } from "@/components/landing/AuthorAlt";
+import { Team } from "@/components/landing/Team";
 import { SectionIntro } from "@/components/landing/SectionIntro";
-import { HBorder, VBordersFade, VBordersFadeFooter } from "@/components/landing/SectionBorder";
+import { HBorder, VBordersFade, VBordersFadeFooter, VBorders } from "@/components/landing/SectionBorder";
 
 export default function Home() {
   return (
@@ -31,15 +33,23 @@ export default function Home() {
         </VBordersFade>
       <HBorder />
 
-      <Bento />
+      {/* <Bento /> */}
 
-      <SectionIntro label="// Author" title="Who is making Neupaper?" />
+      <div className="h-16" />
+      <SectionIntro label="// Motivation" title="Who is making Neupaper?" />
 
       <HBorder />
       <VBordersFade>
         <Author />
       </VBordersFade>
       <HBorder />
+
+      <VBorders>
+        <Team />
+      </VBorders>
+      <HBorder />
+
+      <div className="h-28" />
 
       <VBordersFadeFooter>
         <Footer />

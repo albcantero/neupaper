@@ -1,6 +1,6 @@
 export function SectionIntro({ label, title, description }: { label: string; title: string; description?: string }) {
   return (
-    <section className="max-w-[1250px] mx-auto px-4 pt-16 pb-5">
+    <section className="max-w-[1250px] mx-auto px-4 pt-8 pb-5">
       <div className="flex flex-col gap-1">
         <p className="font-medium text-[15px] tracking-tight uppercase font-mono-display text-accent-display">
           {label}

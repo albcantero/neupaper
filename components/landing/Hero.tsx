@@ -19,7 +19,7 @@ export function Hero() {
           Reusable professional documents written in Markdown
         </h1>
         <div className="flex items-center gap-6">
-          <Button size="sm" className="rounded-full text-xs font-medium tracking-tight uppercase font-mono-display">
+          <Button size="sm" className="rounded-lg text-xs font-medium tracking-tight uppercase font-mono-display bg-accent-display text-foreground hover:bg-foreground hover:text-background">
             <Link href="/vault" className="group flex items-center gap-1.5">
               Open Vault
               <ArrowUpRight className="size-3.5 group-hover:rotate-45 transition-transform duration-200" strokeWidth={2} />
@@ -28,7 +28,7 @@ export function Hero() {
           <Button
             variant="outline"
             size="sm"
-            className="rounded-full text-xs font-medium tracking-tight uppercase font-mono-display"
+            className="rounded-lg bg-background text-foreground shadow-none hover:bg-muted dark:bg-background dark:text-foreground dark:hover:bg-muted dark:border-input text-xs font-medium tracking-tight uppercase font-mono-display"
             onClick={() => scrollTo("intro")}
           >
             <span className="group flex items-center gap-1.5">
